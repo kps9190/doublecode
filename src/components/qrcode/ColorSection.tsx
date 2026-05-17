@@ -1,19 +1,27 @@
 import type { ColorConfig } from "../../types";
 import { useI18n } from "../../i18n";
 
-interface Props { label: string; cfg: ColorConfig; onChange: (v: ColorConfig) => void }
+interface Props {
+    label: string;
+    cfg: ColorConfig;
+    onChange: (v: ColorConfig) => void;
+    compact?: boolean;
+}
 
-export default function ColorSection({ label, cfg, onChange }: Props) {
+export default function ColorSection({ label, cfg, onChange, compact = false }: Props) {
     const { t } = useI18n();
     const set     = (patch: Partial<ColorConfig>) => onChange({ ...cfg, ...patch });
     const setGrad = (patch: Partial<ColorConfig["gradient"]>) => onChange({ ...cfg, gradient: { ...cfg.gradient, ...patch } });
 
     return (
         <div className="border-b last:border-b-0 border-slate-200 py-2 dark:border-slate-700">
-            <div className="flex flex-wrap items-center gap-3">
-                <div className="text-sm font-medium text-slate-700 dark:text-slate-300 grow-0 shrink-0 basis-36 md:basis-2/5">{label}</div>
+            <div className={`flex flex-wrap ${compact ? "items-start gap-2" : "items-center gap-3"}`}>
+                <div className={`font-medium text-slate-700 dark:text-slate-300 grow-0 shrink-0 ${
+                    compact ? "basis-full text-xs" : "basis-36 text-sm md:basis-2/5"
+                }`}>{label}</div>
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     <label
+                        onClick={() => set({ mode: "solid" })}
                         className={`relative inline-flex h-7 cursor-pointer items-center gap-2 overflow-hidden rounded-lg border px-2.5 text-xs transition-colors ${
                             cfg.mode === "solid"
                                 ? "border-blue-600 bg-blue-600 text-white"
@@ -25,6 +33,8 @@ export default function ColorSection({ label, cfg, onChange }: Props) {
                         <input
                             type="color"
                             value={cfg.solid}
+                            onClick={() => set({ mode: "solid" })}
+                            onFocus={() => set({ mode: "solid" })}
                             onChange={(e) => set({ mode: "solid", solid: e.target.value })}
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                         />

@@ -56,6 +56,8 @@ export interface QRState {
     backgroundColor: string;
     transparentBg:   boolean;
     image:           string | null;
+    imageName:       string;
+    imageSize:       number;
     imageMargin:     number;
     showText:     boolean;
     useTextOverride: boolean;

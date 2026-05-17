@@ -12,7 +12,7 @@ interface Props {
 export default function BarcodePreviewPanel({ barcode, input }: Props) {
     return (
         <div className="space-y-4">
-            <div className="flex min-h-[180px] items-center justify-center md:min-h-[320px]">
+            <div className="flex min-h-[120px] items-center justify-center md:min-h-[320px]">
                 <BarcodePreview
                     codeData={input.codeData}
                     opts={barcode.opts}

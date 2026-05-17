@@ -26,19 +26,14 @@ export default function QRBorderSection({ border, onChange }: Props) {
     const setDeco = (key: typeof SIDES[number]["key"], patch: Partial<DecorationSide>) =>
         onChange({ [key]: { ...border[key], ...patch } });
 
+    if (!isQRBorderPluginEnabled) return null;
+
     return (
         <>
             <SectionTitle>{t("qr.border")}</SectionTitle>
-            {!isQRBorderPluginEnabled && (
-                <div className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
-                    {t("qr.borderDisabled")}
-                </div>
-            )}
-            {isQRBorderPluginEnabled && (
-                <Toggle label={t("qr.useBorder")} checked={border.enabled} onChange={(v) => set({ enabled: v })} />
-            )}
+            <Toggle label={t("qr.useBorder")} checked={border.enabled} onChange={(v) => set({ enabled: v })} />
 
-            {isQRBorderPluginEnabled && border.enabled && (
+            {border.enabled && (
                 <>
                     <RangeField id="br-thick" label={t("qr.borderThickness")}      min={10} max={120}           value={border.thickness} onChange={(v) => set({ thickness: v })} />
                     <RangeField id="br-round" label={t("qr.borderRound")} min={0}  max={1}  step={0.05} value={border.round}    onChange={(v) => set({ round: v })} />

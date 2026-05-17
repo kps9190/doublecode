@@ -48,7 +48,7 @@ export const DEFAULT_BARCODE: BarcodeState = {
     margin: 10,
     useDetailedMargin: false,
     marginTop: 10, marginBottom: 10, marginLeft: 10, marginRight: 10,
-    displayValue: true,
+    displayValue: false,
     useTextOverride: false,
     textOverride: "",
     textAlign: "center",

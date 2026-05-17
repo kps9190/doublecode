@@ -54,7 +54,7 @@ export function buildQRConfig(opts: QRState, data: string): Partial<Options> {
         ...(opts.image
             ? {
                   image: opts.image,
-                  imageOptions: { crossOrigin: "anonymous", margin: opts.imageMargin },
+                  imageOptions: { crossOrigin: "anonymous", imageSize: opts.imageSize, margin: opts.imageMargin },
               }
             : {}),
     };

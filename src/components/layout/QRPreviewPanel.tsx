@@ -14,7 +14,7 @@ interface Props {
 export default function QRPreviewPanel({ qr, input, containerRef }: Props) {
     return (
         <div className="space-y-4">
-            <div className="relative flex min-h-[220px] items-center justify-center md:min-h-[320px]">
+            <div className="relative flex min-h-[260px] w-full items-center justify-center md:min-h-[320px]">
                 <QRCard
                     renderKey={qr.renderKey}
                     codeData={input.codeData}

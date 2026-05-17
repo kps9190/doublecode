@@ -14,39 +14,35 @@ export default function BarcodeTextSection({ opts, onChange }: Props) {
     const textAlignOptions = [{ value: "left", label: t("common.left") }, { value: "center", label: t("common.center") }, { value: "right", label: t("common.right") }] as const;
     const textPositionOptions = [{ value: "bottom", label: t("common.bottom") }, { value: "top", label: t("common.top") }] as const;
 
+    if (!opts.displayValue) return null;
+
     return (
         <>
             <SectionTitle>{t("common.textSettings")}</SectionTitle>
-            <Toggle label={t("common.showText")} checked={opts.displayValue} onChange={(v) => onChange({ displayValue: v })} />
-
-            {opts.displayValue && (
-                <>
-                    <Toggle label={t("common.overrideText")} checked={opts.useTextOverride} onChange={(v) => onChange({ useTextOverride: v })} />
-                    {opts.useTextOverride && (
-                        <FieldRow label={t("common.displayText")}>
-                            <input
-                                type="text" value={opts.textOverride}
-                                onChange={(e) => onChange({ textOverride: e.target.value })}
-                                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white px-2 h-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </FieldRow>
-                    )}
-                    <FieldRow label={t("common.horizontal")}>
-                        <SegmentSelect value={opts.textAlign}    options={textAlignOptions}    onChange={(v) => onChange({ textAlign: v as BarcodeState["textAlign"] })} />
-                    </FieldRow>
-                    <FieldRow label={t("common.vertical")}>
-                        <SegmentSelect value={opts.textPosition} options={textPositionOptions} onChange={(v) => onChange({ textPosition: v as BarcodeState["textPosition"] })} />
-                    </FieldRow>
-                    <SelectField label={t("common.font")} value={opts.font} options={FONT_FAMILIES} onChange={(v) => onChange({ font: v as BarcodeState["font"] })} />
-                    <CheckboxPair
-                        label={t("common.textStyle")}
-                        boldChecked={opts.bold}     onBoldChange={(v) => onChange({ bold: v })}
-                        italicChecked={opts.italic} onItalicChange={(v) => onChange({ italic: v })}
+            <Toggle label={t("common.overrideText")} checked={opts.useTextOverride} onChange={(v) => onChange({ useTextOverride: v })} />
+            {opts.useTextOverride && (
+                <FieldRow label={t("common.displayText")}>
+                    <input
+                        type="text" value={opts.textOverride}
+                        onChange={(e) => onChange({ textOverride: e.target.value })}
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white px-2 h-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <RangeField id="bc-fs" label={t("common.textSize")} min={8}   max={60} value={opts.fontSize}   onChange={(v) => onChange({ fontSize: v })} />
-                    <RangeField id="bc-tm" label={t("common.textMargin")} min={-10} max={40} value={opts.textMargin} onChange={(v) => onChange({ textMargin: v })} />
-                </>
+                </FieldRow>
             )}
+            <FieldRow label={t("common.horizontal")}>
+                <SegmentSelect value={opts.textAlign}    options={textAlignOptions}    onChange={(v) => onChange({ textAlign: v as BarcodeState["textAlign"] })} />
+            </FieldRow>
+            <FieldRow label={t("common.vertical")}>
+                <SegmentSelect value={opts.textPosition} options={textPositionOptions} onChange={(v) => onChange({ textPosition: v as BarcodeState["textPosition"] })} />
+            </FieldRow>
+            <SelectField label={t("common.font")} value={opts.font} options={FONT_FAMILIES} onChange={(v) => onChange({ font: v as BarcodeState["font"] })} />
+            <CheckboxPair
+                label={t("common.textStyle")}
+                boldChecked={opts.bold}     onBoldChange={(v) => onChange({ bold: v })}
+                italicChecked={opts.italic} onItalicChange={(v) => onChange({ italic: v })}
+            />
+            <RangeField id="bc-fs" label={t("common.textSize")} min={8}   max={60} value={opts.fontSize}   onChange={(v) => onChange({ fontSize: v })} />
+            <RangeField id="bc-tm" label={t("common.textMargin")} min={-10} max={40} value={opts.textMargin} onChange={(v) => onChange({ textMargin: v })} />
         </>
     );
 }

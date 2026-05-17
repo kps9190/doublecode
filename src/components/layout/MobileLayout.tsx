@@ -20,7 +20,7 @@ const SWIPE_THRESHOLD = 48;
 
 export default function MobileLayout({ barcode, qr, input, isInvalid, activeView, onViewChange }: Props) {
     const touchStartX = useRef(0);
-    const activeIndex = activeView === "qr" ? 0 : 1;
+    const activeIndex = activeView === "barcode" ? 0 : 1;
 
     const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
         touchStartX.current = event.changedTouches[0]?.clientX ?? 0;
@@ -30,8 +30,8 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
         const touchEndX = event.changedTouches[0]?.clientX ?? touchStartX.current;
         const distance = touchEndX - touchStartX.current;
 
-        if (distance < -SWIPE_THRESHOLD) onViewChange("barcode");
-        if (distance > SWIPE_THRESHOLD) onViewChange("qr");
+        if (distance < -SWIPE_THRESHOLD) onViewChange("qr");
+        if (distance > SWIPE_THRESHOLD) onViewChange("barcode");
     };
 
     return (
@@ -46,10 +46,10 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
                     style={{ transform: `translateX(-${activeIndex * 100}%)` }}
                 >
                     <div className="w-full shrink-0">
-                        <QRPreviewPanel qr={qr} input={input} containerRef={qr.containerRefM} />
+                        <BarcodePreviewPanel barcode={barcode} input={input} />
                     </div>
                     <div className="w-full shrink-0">
-                        <BarcodePreviewPanel barcode={barcode} input={input} />
+                        <QRPreviewPanel qr={qr} input={input} containerRef={qr.containerRefM} />
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { BarcodeState } from "../../../types";
-import { ColorField, Toggle, SectionTitle } from "../../ui";
+import { BackgroundField, ColorField, SectionTitle } from "../../ui";
 import { useI18n } from "../../../i18n";
 
 interface Props {
@@ -21,17 +21,17 @@ export default function BarcodeColorSection({ opts, onChange }: Props) {
         <>
             <SectionTitle>{t("common.color")}</SectionTitle>
             <ColorField label={t("barcode.color")} value={opts.lineColor} onChange={(v) => onChange({ lineColor: v })} />
-            <Toggle
-                label={t("common.transparentBackground")}
-                checked={opts.transparentBg}
-                onChange={(v) => {
+            <BackgroundField
+                label={t("common.backgroundColor")}
+                color={opts.background}
+                transparent={opts.transparentBg}
+                transparentLabel={t("common.transparentShort")}
+                onColorChange={(v) => onChange({ background: v })}
+                onTransparentChange={(v) => {
                     if (v) onChange({ transparentBg: true, background: "transparent" });
                     else   onChange({ transparentBg: false, background: lastBgRef.current });
                 }}
             />
-            {!opts.transparentBg && (
-                <ColorField label={t("barcode.backgroundColor")} value={opts.background} onChange={(v) => onChange({ background: v })} />
-            )}
         </>
     );
 }

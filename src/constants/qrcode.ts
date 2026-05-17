@@ -66,7 +66,7 @@ export const DEFAULT_QR: QRState = {
     cornerDotColor:    makeDefaultColor("#111827"),
     backgroundColor: "#f8fafc",
     transparentBg: false,
-    image: null, imageMargin: 5,
+    image: null, imageName: "", imageSize: 0.4, imageMargin: 5,
     showText: false,
     useTextOverride: false,
     textOverride: "",

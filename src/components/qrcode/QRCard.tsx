@@ -23,10 +23,17 @@ export default function QRCard({ renderKey, codeData, opts, containerRef, onRead
     const hasWarning = !!warning || !!validateQRData(codeData, opts.mode);
     const bgClass = isEmpty || hasWarning
         ? "bg-transparent shadow-none"
-        : `${opts.transparentBg ? "checkerboard" : "bg-white"} shadow-lg shadow-slate-950/20`;
+        : `${opts.transparentBg ? "checkerboard" : ""} shadow-lg shadow-slate-950/20`;
+    const backgroundColor = !isEmpty && !hasWarning && !opts.transparentBg
+        ? opts.backgroundColor
+        : undefined;
 
     return (
-        <div ref={containerRef} className={`inline-flex max-w-full overflow-auto rounded-md ${bgClass}`}>
+        <div
+            ref={containerRef}
+            className={`inline-flex max-w-full overflow-auto rounded-md ${bgClass}`}
+            style={{ backgroundColor }}
+        >
             <QRPreview
                 key={renderKey}
                 codeData={codeData}

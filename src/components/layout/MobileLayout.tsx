@@ -21,6 +21,8 @@ const SWIPE_THRESHOLD = 48;
 export default function MobileLayout({ barcode, qr, input, isInvalid, activeView, onViewChange }: Props) {
     const touchStartX = useRef(0);
     const activeIndex = activeView === "barcode" ? 0 : 1;
+    const isBarcodeActive = activeView === "barcode";
+    const inactivePanelClass = "h-0 overflow-hidden";
 
     const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
         touchStartX.current = event.changedTouches[0]?.clientX ?? 0;
@@ -36,7 +38,7 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
 
     return (
         <div
-            className="md:hidden space-y-6 mt-2"
+            className="md:hidden space-y-3 mt-2"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
         >
@@ -45,10 +47,10 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
                     className="flex transition-transform duration-300 ease-out"
                     style={{ transform: `translateX(-${activeIndex * 100}%)` }}
                 >
-                    <div className="w-full shrink-0">
+                    <div className={`w-full shrink-0 ${isBarcodeActive ? "" : inactivePanelClass}`} aria-hidden={!isBarcodeActive}>
                         <BarcodePreviewPanel barcode={barcode} input={input} />
                     </div>
-                    <div className="w-full shrink-0">
+                    <div className={`w-full shrink-0 ${isBarcodeActive ? inactivePanelClass : ""}`} aria-hidden={isBarcodeActive}>
                         <QRPreviewPanel qr={qr} input={input} containerRef={qr.containerRefM} />
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import type { BarcodeState, BarcodeReadyAPI } from "../../types";
-import { serializeSVG, downloadAsSVG, downloadAsPNG, makeSafeName } from "../../utils";
+import { BarcodeDownloadService } from "../../utils";
 import { EMPTY_CODE_MESSAGE, UNSUPPORTED_BARCODE_MESSAGE } from "../../constants";
 import { buildBarcodeOptions, clearBarcodeSVG } from "./barcodePreviewConfig";
 import { useI18n } from "../../i18n";
@@ -40,11 +40,6 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
         }
     }, [codeData, opts, reportError]);
 
-    const makeFilename = useCallback((ext: string) => {
-        const label = opts.useTextOverride && opts.textOverride.trim() ? opts.textOverride : codeData;
-        return `barcode_${opts.format}_${makeSafeName(label) || "code"}.${ext}`;
-    }, [codeData, opts]);
-
     useEffect(() => {
         if (!onReady) return;
         onReady({
@@ -52,15 +47,15 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
             downloadSVG: () => {
                 const svg = svgRef.current;
                 if (!svg) return;
-                downloadAsSVG(makeFilename("svg"), serializeSVG(svg).xml);
+                new BarcodeDownloadService(svg, opts, codeData).downloadSVG();
             },
             downloadPNG: (scale = 3) => {
                 const svg = svgRef.current;
                 if (!svg) return;
-                downloadAsPNG(makeFilename("png"), serializeSVG(svg), opts.transparentBg ? "transparent" : opts.background, scale);
+                new BarcodeDownloadService(svg, opts, codeData).downloadPNG(scale);
             },
         });
-    }, [error, codeData, opts, makeFilename, onReady]);
+    }, [error, codeData, opts, onReady]);
 
     const showSvg = !!codeData && !error;
     const showMessage = !showSvg;

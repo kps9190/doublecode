@@ -31,6 +31,7 @@ export default function Header({ dark, activeMobileView, onMobileViewChange, onT
                     onToggleLanguage={toggleLanguage}
                     onToggleTheme={onToggle}
                     className="absolute right-0 top-5 hidden md:inline-flex sm:top-7"
+                    vertical
                 />
             </div>
             <div className="mx-auto mt-7 flex w-full items-center gap-3 md:hidden">
@@ -76,10 +77,10 @@ function HeaderActions({
     className?: string;
     vertical?: boolean;
 }) {
-    const actionClass = "h-9 rounded-full text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700";
+    const actionClass = "h-9 rounded-md text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700";
 
     return (
-        <div className={`${className} ${vertical ? "flex-col" : ""} items-center rounded-full border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/80`}>
+        <div className={`${className} ${vertical ? "flex-col" : ""} items-center rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/80`}>
             <button
                 type="button"
                 onClick={onToggleLanguage}

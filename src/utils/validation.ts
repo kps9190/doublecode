@@ -20,16 +20,3 @@ export function validateQRData(value: string, mode: QRMode): string | null {
 
     return null;
 }
-
-/**
- * 파일 다운로드에 안전한 파일명 생성.
- * 공백 → 언더스코어, 특수문자 제거, 길이 제한.
- */
-export function makeSafeName(s: string, maxLen = 64): string {
-    return (s || "")
-        .replace(/\s+/g, "_")
-        .replace(/[^\w-]+/g, "_")
-        .replace(/_+/g, "_")
-        .slice(0, maxLen)
-        .replace(/^_+|_+$/g, "");
-}

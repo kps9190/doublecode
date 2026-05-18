@@ -3,9 +3,7 @@ import type { UseBarcodeReturn }   from "../../hooks/useBarcode";
 import type { UseQRCodeReturn }    from "../../hooks/useQRCode";
 import type { CombinedInputState } from "../../hooks/useCombinedInput";
 import type { MobileCodeView }     from "../../types";
-import BarcodePreviewPanel         from "./BarcodePreviewPanel";
-import CombinedInput               from "./CombinedInput";
-import QRPreviewPanel              from "./QRPreviewPanel";
+import { BarcodeMobileSlide, QRMobileSlide } from "./MobileCodeSlide";
 
 interface Props {
     barcode:   UseBarcodeReturn;
@@ -22,7 +20,6 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
     const touchStartX = useRef(0);
     const activeIndex = activeView === "barcode" ? 0 : 1;
     const isBarcodeActive = activeView === "barcode";
-    const inactivePanelClass = "h-0 overflow-hidden";
 
     const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
         touchStartX.current = event.changedTouches[0]?.clientX ?? 0;
@@ -47,15 +44,19 @@ export default function MobileLayout({ barcode, qr, input, isInvalid, activeView
                     className="flex transition-transform duration-300 ease-out"
                     style={{ transform: `translateX(-${activeIndex * 100}%)` }}
                 >
-                    <div className={`w-full shrink-0 ${isBarcodeActive ? "" : inactivePanelClass}`} aria-hidden={!isBarcodeActive}>
-                        <BarcodePreviewPanel barcode={barcode} input={input} />
+                    {/* 각 슬라이드 안에 미리보기, 입력, 설정을 함께 둬야 전체 화면이 같이 스와이프된다. */}
+                    <div className="w-full shrink-0">
+                        {isBarcodeActive && (
+                            <BarcodeMobileSlide barcode={barcode} input={input} isInvalid={isInvalid} />
+                        )}
                     </div>
-                    <div className={`w-full shrink-0 ${isBarcodeActive ? inactivePanelClass : ""}`} aria-hidden={isBarcodeActive}>
-                        <QRPreviewPanel qr={qr} input={input} containerRef={qr.containerRefM} />
+                    <div className="w-full shrink-0">
+                        {!isBarcodeActive && (
+                            <QRMobileSlide qr={qr} input={input} isInvalid={isInvalid} />
+                        )}
                     </div>
                 </div>
             </div>
-            <CombinedInput {...input} isInvalid={isInvalid} />
         </div>
     );
 }

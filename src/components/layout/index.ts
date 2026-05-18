@@ -6,3 +6,5 @@ export { default as QRPreviewPanel }   from "./QRPreviewPanel";
 export { default as ShowTextToggle }   from "./ShowTextToggle";
 export { default as MobileLayout }     from "./MobileLayout";
 export { default as DesktopLayout }    from "./DesktopLayout";
+export { default as Footer }           from "./Footer";
+export { BarcodeMobileSlide, QRMobileSlide } from "./MobileCodeSlide";

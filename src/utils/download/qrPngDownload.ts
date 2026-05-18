@@ -33,7 +33,9 @@ function downloadCanvasAsPNG(
     filename: string
 ): void {
     if (!opts.showText) {
-        qrCanvas.toBlob((blob) => {
+        // SVG 렌더러/플러그인이 만든 실제 캔버스 크기보다 사용자 설정 크기를 우선한다.
+        const outputCanvas = resizeCanvas(qrCanvas, opts.width, opts.height);
+        outputCanvas.toBlob((blob) => {
             if (blob) blobToDownload(filename + ".png", blob);
         }, "image/png");
         return;
@@ -119,6 +121,7 @@ function makeCanvasFromQRSVG(containerEl: HTMLElement | null): Promise<HTMLCanva
     canvas.height = Number(svg.getAttribute("height")) || svg.viewBox.baseVal.height;
 
     return new Promise((resolve, reject) => {
+        // SVG만 렌더링된 QR도 PNG 다운로드가 가능하도록 임시 이미지로 변환한다.
         const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml" }));
         image.onload = () => {
             canvas.getContext("2d")?.drawImage(image, 0, 0);
@@ -152,4 +155,14 @@ function resolveTextX(align: string, canvasW: number, scale: number): number {
     if (align === "left")  return 10 * scale;
     if (align === "right") return canvasW - 10 * scale;
     return canvasW / 2;
+}
+
+function resizeCanvas(source: HTMLCanvasElement, width: number, height: number): HTMLCanvasElement {
+    if (source.width === width && source.height === height) return source;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext("2d")?.drawImage(source, 0, 0, width, height);
+    return canvas;
 }

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import QRCodeStyling from "qr-code-styling";
 import type { QRState, QRReadyAPI } from "../../types";
-import { applyQRBorderPlugin, validateQRData, makeSafeName, downloadQRPNG, downloadQRSVG, clearQRContainer, getQRDisplayText } from "../../utils";
+import { applyQRBorderPlugin, validateQRData, QRDownloadService, clearQRContainer, getQRDisplayText } from "../../utils";
 import { EMPTY_CODE_MESSAGE, UNSUPPORTED_QR_MESSAGE } from "../../constants";
 import { buildQRConfig, buildQRTextStyle } from "./qrPreviewConfig";
 import { useI18n } from "../../i18n";
@@ -73,19 +73,14 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
         }
     }, [error]);
 
-    const getFilename = useCallback(
-        () => `qr_${opts.errorCorrectionLevel}_${makeSafeName(codeData) || "code"}`,
-        [codeData, opts.errorCorrectionLevel]
-    );
-
     useEffect(() => {
         if (!onReady) return;
         onReady({
             canDownload: !error && !!codeData.trim(),
-            downloadPNG: () => downloadQRPNG(containerRef.current, opts, codeData, getFilename()),
-            downloadSVG: () => downloadQRSVG(containerRef.current, qrRef.current, opts, codeData, getFilename()),
+            downloadPNG: () => new QRDownloadService(containerRef.current, qrRef.current, opts, codeData).downloadPNG(),
+            downloadSVG: () => new QRDownloadService(containerRef.current, qrRef.current, opts, codeData).downloadSVG(),
         });
-    }, [error, codeData, opts, getFilename, onReady]);
+    }, [error, codeData, opts, onReady]);
 
     const textStyle = useMemo(() => buildQRTextStyle(opts), [opts]);
     const displayText = getQRDisplayText(opts, codeData);

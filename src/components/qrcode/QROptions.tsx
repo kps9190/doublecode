@@ -24,7 +24,7 @@ export default function QROptions({ opts, onChange, onForceRecreate }: Props) {
         <Card title={t("qr.options")}>
             <QRBasicSection  opts={opts} onChange={onChange} onForceRecreate={onForceRecreate} />
             <QRShapeSection  opts={opts} onChange={onChange} />
-            <QRColorGroup    opts={opts} onChange={onChange} />
+            <QRColorGroup    opts={opts} onChange={onChange} onForceRecreate={onForceRecreate} />
             <QRImageSection  opts={opts} onChange={onChange} />
             <QRTextSection   opts={opts} onChange={onChange} />
             {/* 테두리 — 글자 설정처럼 섹션 아래에 통합 */}

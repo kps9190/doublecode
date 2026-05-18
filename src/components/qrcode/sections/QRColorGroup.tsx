@@ -7,6 +7,7 @@ import { useI18n } from "../../../i18n";
 interface Props {
     opts:     QRState;
     onChange: (patch: Partial<QRState>) => void;
+    onForceRecreate: () => void;
 }
 
 function cloneColorConfig(color: ColorConfig): ColorConfig {
@@ -17,15 +18,24 @@ function cloneColorConfig(color: ColorConfig): ColorConfig {
 }
 
 /** QR 점·모서리 색상 + 배경색 설정 섹션 */
-export default function QRColorGroup({ opts, onChange }: Props) {
+export default function QRColorGroup({ opts, onChange, onForceRecreate }: Props) {
     const { t } = useI18n();
     const [advanced, setAdvanced] = useState(false);
-    const setAllColors = (color: QRState["dotColor"]) =>
+    const recreateIfModeChanged = (prev: ColorConfig, next: ColorConfig) => {
+        if (prev.mode !== next.mode) onForceRecreate();
+    };
+    const setAllColors = (color: QRState["dotColor"]) => {
+        recreateIfModeChanged(opts.dotColor, color);
         onChange({
             dotColor: color,
             cornerSquareColor: cloneColorConfig(color),
             cornerDotColor: cloneColorConfig(color),
         });
+    };
+    const setColor = (key: "dotColor" | "cornerSquareColor" | "cornerDotColor", color: ColorConfig) => {
+        recreateIfModeChanged(opts[key], color);
+        onChange({ [key]: color });
+    };
 
     return (
         <>
@@ -39,9 +49,9 @@ export default function QRColorGroup({ opts, onChange }: Props) {
                 <ColorSection label={t("qr.allColor")} cfg={opts.dotColor} onChange={setAllColors} />
             ) : (
                 <div className="grid gap-2 lg:grid-cols-3">
-                    <ColorSection compact label={t("qr.dotColor")}          cfg={opts.dotColor}          onChange={(v) => onChange({ dotColor: v })} />
-                    <ColorSection compact label={t("qr.cornerSquareColor")} cfg={opts.cornerSquareColor} onChange={(v) => onChange({ cornerSquareColor: v })} />
-                    <ColorSection compact label={t("qr.cornerDotColor")}    cfg={opts.cornerDotColor}    onChange={(v) => onChange({ cornerDotColor: v })} />
+                    <ColorSection compact label={t("qr.dotColor")}          cfg={opts.dotColor}          onChange={(v) => setColor("dotColor", v)} />
+                    <ColorSection compact label={t("qr.cornerSquareColor")} cfg={opts.cornerSquareColor} onChange={(v) => setColor("cornerSquareColor", v)} />
+                    <ColorSection compact label={t("qr.cornerDotColor")}    cfg={opts.cornerDotColor}    onChange={(v) => setColor("cornerDotColor", v)} />
                 </div>
             )}
             <BackgroundField

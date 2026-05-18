@@ -11,6 +11,7 @@ interface Props {
 
 export default function BarcodePreviewPanel({ barcode, input }: Props) {
     const isInputEmpty = !input.codeData.trim();
+    const disableShowText = isInputEmpty || !!barcode.error;
 
     return (
         <div className="space-y-4">
@@ -24,7 +25,7 @@ export default function BarcodePreviewPanel({ barcode, input }: Props) {
             </div>
             <ShowTextToggle
                 checked={barcode.opts.displayValue}
-                disabled={isInputEmpty}
+                disabled={disableShowText}
                 onChange={(displayValue) => barcode.setOpts({ displayValue })}
             />
             <DownloadButtons

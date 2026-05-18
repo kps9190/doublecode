@@ -21,6 +21,7 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
     const { t } = useI18n();
     const svgRef = useRef<SVGSVGElement>(null);
     const [error, setError] = useState<string | null>(null);
+    const hasBarcodeData = codeData.trim().length > 0;
 
     const reportError = useCallback((msg: string | null) => {
         setError(msg);
@@ -29,7 +30,11 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
 
     useEffect(() => {
         const svg = svgRef.current;
-        if (!svg || !codeData) { reportError(null); return; }
+        if (!svg || !hasBarcodeData) {
+            clearBarcodeSVG(svg);
+            reportError(null);
+            return;
+        }
         try {
             let isValid = true;
             JsBarcode(svg, codeData, buildBarcodeOptions(opts, (v) => { isValid = v; }));
@@ -38,12 +43,12 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
             clearBarcodeSVG(svg);
             reportError(UNSUPPORTED_BARCODE_MESSAGE);
         }
-    }, [codeData, opts, reportError]);
+    }, [codeData, hasBarcodeData, opts, reportError]);
 
     useEffect(() => {
         if (!onReady) return;
         onReady({
-            canDownload: !error && !!codeData,
+            canDownload: !error && hasBarcodeData,
             downloadSVG: () => {
                 const svg = svgRef.current;
                 if (!svg) return;
@@ -55,9 +60,9 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
                 new BarcodeDownloadService(svg, opts, codeData).downloadPNG(scale);
             },
         });
-    }, [error, codeData, opts, onReady]);
+    }, [error, codeData, hasBarcodeData, opts, onReady]);
 
-    const showSvg = !!codeData && !error;
+    const showSvg = hasBarcodeData && !error;
     const showMessage = !showSvg;
     const previewBg = showSvg
         ? opts.transparentBg ? "checkerboard shadow-lg shadow-slate-950/20" : "bg-white shadow-lg shadow-slate-950/20"
@@ -65,10 +70,10 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
 
     return (
         <div className={`inline-flex max-w-full overflow-auto rounded-md ${previewBg} ${showMessage ? "px-6 py-5" : "p-0"}`}>
-            {!codeData && (
+            {!hasBarcodeData && (
                 <p className="text-sm text-slate-400">{t(EMPTY_CODE_MESSAGE)}</p>
             )}
-            {!!codeData && !!error && (
+            {hasBarcodeData && !!error && (
                 <div className="text-sm text-amber-400 text-center py-4 space-y-1">
                     <div className="text-xl">⚠️</div>
                     <p className="text-xs">{t(error)}</p>

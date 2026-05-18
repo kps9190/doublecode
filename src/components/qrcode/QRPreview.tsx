@@ -22,6 +22,8 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
     const containerRef = useRef<HTMLDivElement>(null);
     const qrRef        = useRef<QRCodeStyling | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const validationWarning = codeData.trim() ? validateQRData(codeData, opts.mode) : null;
+    const displayError = error || validationWarning;
 
     useEffect(() => {
         if (!codeData.trim()) {
@@ -41,7 +43,6 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
             return;
         }
 
-        setError(null);
         if (!containerRef.current) return;
 
         const data = codeData.trim();
@@ -57,6 +58,7 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
                 qrRef.current?.update(config);
             }
             applyQRBorderPlugin(qrRef.current, opts.border);
+            setError(null);
         } catch {
             const message = UNSUPPORTED_QR_MESSAGE;
             clearQRContainer(containerRef.current);
@@ -76,11 +78,11 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
     useEffect(() => {
         if (!onReady) return;
         onReady({
-            canDownload: !error && !!codeData.trim(),
+            canDownload: !displayError && !!codeData.trim(),
             downloadPNG: () => new QRDownloadService(containerRef.current, qrRef.current, opts, codeData).downloadPNG(),
             downloadSVG: () => new QRDownloadService(containerRef.current, qrRef.current, opts, codeData).downloadSVG(),
         });
-    }, [error, codeData, opts, onReady]);
+    }, [displayError, codeData, opts, onReady]);
 
     const textStyle = useMemo(() => buildQRTextStyle(opts), [opts]);
     const displayText = getQRDisplayText(opts, codeData);
@@ -89,11 +91,18 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
         return <p className="px-6 py-5 text-sm text-slate-500 dark:text-slate-400">{t(EMPTY_CODE_MESSAGE)}</p>;
     }
 
-    if (error) {
+    if (displayError) {
         return (
-            <div className="text-sm text-amber-400 text-center px-4 space-y-1 py-8">
-                <div className="text-2xl">⚠️</div>
-                <p className="text-xs">{t(error)}</p>
+            <div>
+                <div
+                    ref={containerRef}
+                    className="hidden"
+                    style={{ width: opts.width, height: opts.height }}
+                />
+                <div className="text-sm text-amber-400 text-center px-4 space-y-1 py-8">
+                    <div className="text-2xl">⚠️</div>
+                    <p className="text-xs">{t(displayError)}</p>
+                </div>
             </div>
         );
     }

@@ -12,6 +12,8 @@ interface Props {
 }
 
 export default function QRPreviewPanel({ qr, input, containerRef }: Props) {
+    const isInputEmpty = !input.codeData.trim();
+
     return (
         <div className="space-y-4">
             <div className="relative flex min-h-[260px] w-full items-center justify-center md:min-h-[320px]">
@@ -27,6 +29,7 @@ export default function QRPreviewPanel({ qr, input, containerRef }: Props) {
             </div>
             <ShowTextToggle
                 checked={qr.opts.showText}
+                disabled={isInputEmpty}
                 onChange={(showText) => qr.setOpts({ showText })}
             />
             <DownloadButtons

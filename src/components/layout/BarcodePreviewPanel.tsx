@@ -10,6 +10,8 @@ interface Props {
 }
 
 export default function BarcodePreviewPanel({ barcode, input }: Props) {
+    const isInputEmpty = !input.codeData.trim();
+
     return (
         <div className="space-y-4">
             <div className="flex min-h-[120px] items-center justify-center md:min-h-[320px]">
@@ -22,6 +24,7 @@ export default function BarcodePreviewPanel({ barcode, input }: Props) {
             </div>
             <ShowTextToggle
                 checked={barcode.opts.displayValue}
+                disabled={isInputEmpty}
                 onChange={(displayValue) => barcode.setOpts({ displayValue })}
             />
             <DownloadButtons

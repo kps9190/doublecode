@@ -1,3 +1,4 @@
+import type { TouchEventHandler } from "react";
 import type { UseBarcodeReturn } from "../../hooks/useBarcode";
 import type { CombinedInputState } from "../../hooks/useCombinedInput";
 import { BarcodePreview } from "../barcode";
@@ -7,15 +8,22 @@ import ShowTextToggle from "./ShowTextToggle";
 interface Props {
     barcode: UseBarcodeReturn;
     input: CombinedInputState;
+    previewSwipeHandlers?: {
+        onTouchStart: TouchEventHandler<HTMLDivElement>;
+        onTouchEnd: TouchEventHandler<HTMLDivElement>;
+    };
 }
 
-export default function BarcodePreviewPanel({ barcode, input }: Props) {
+export default function BarcodePreviewPanel({ barcode, input, previewSwipeHandlers }: Props) {
     const isInputEmpty = !input.codeData.trim();
     const disableShowText = isInputEmpty || !!barcode.error;
 
     return (
         <div className="space-y-4">
-            <div className="flex min-h-[120px] items-center justify-center md:min-h-[320px]">
+            <div
+                className="flex min-h-[120px] items-center justify-center md:min-h-[320px]"
+                {...previewSwipeHandlers}
+            >
                 <BarcodePreview
                     codeData={input.codeData}
                     opts={barcode.opts}

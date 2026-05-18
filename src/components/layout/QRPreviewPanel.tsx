@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import type { RefObject, TouchEventHandler } from "react";
 import type { UseQRCodeReturn } from "../../hooks/useQRCode";
 import type { CombinedInputState } from "../../hooks/useCombinedInput";
 import { QRCard } from "../qrcode";
@@ -9,15 +9,22 @@ interface Props {
     qr: UseQRCodeReturn;
     input: CombinedInputState;
     containerRef: RefObject<HTMLDivElement | null>;
+    previewSwipeHandlers?: {
+        onTouchStart: TouchEventHandler<HTMLDivElement>;
+        onTouchEnd: TouchEventHandler<HTMLDivElement>;
+    };
 }
 
-export default function QRPreviewPanel({ qr, input, containerRef }: Props) {
+export default function QRPreviewPanel({ qr, input, containerRef, previewSwipeHandlers }: Props) {
     const isInputEmpty = !input.codeData.trim();
     const disableShowText = isInputEmpty || !!qr.warning;
 
     return (
         <div className="space-y-4">
-            <div className="relative flex min-h-[260px] w-full items-center justify-center md:min-h-[320px]">
+            <div
+                className="relative flex min-h-[260px] w-full items-center justify-center md:min-h-[320px]"
+                {...previewSwipeHandlers}
+            >
                 <QRCard
                     renderKey={qr.renderKey}
                     codeData={input.codeData}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { ColorConfig, QRState } from "../../../types";
 import { AdvancedSectionHeader, BackgroundField } from "../../ui";
 import ColorSection from "../ColorSection";
@@ -17,12 +17,41 @@ function cloneColorConfig(color: ColorConfig): ColorConfig {
     };
 }
 
+function cloneColorState(opts: QRState) {
+    return {
+        dotColor: cloneColorConfig(opts.dotColor),
+        cornerSquareColor: cloneColorConfig(opts.cornerSquareColor),
+        cornerDotColor: cloneColorConfig(opts.cornerDotColor),
+    };
+}
+
 /** QR 점·모서리 색상 + 배경색 설정 섹션 */
 export default function QRColorGroup({ opts, onChange, onForceRecreate }: Props) {
     const { t } = useI18n();
     const [advanced, setAdvanced] = useState(false);
+    const basicColorSnapshotRef = useRef<ReturnType<typeof cloneColorState> | null>(null);
     const recreateIfModeChanged = (prev: ColorConfig, next: ColorConfig) => {
         if (prev.mode !== next.mode) onForceRecreate();
+    };
+    const recreateOnNextFrame = () => window.requestAnimationFrame(onForceRecreate);
+    const toggleAdvanced = () => {
+        if (advanced) {
+            const snapshot = basicColorSnapshotRef.current;
+            basicColorSnapshotRef.current = null;
+            setAdvanced(false);
+
+            if (!snapshot) return;
+            onChange({
+                dotColor: cloneColorConfig(snapshot.dotColor),
+                cornerSquareColor: cloneColorConfig(snapshot.cornerSquareColor),
+                cornerDotColor: cloneColorConfig(snapshot.cornerDotColor),
+            });
+            recreateOnNextFrame();
+            return;
+        }
+
+        basicColorSnapshotRef.current = cloneColorState(opts);
+        setAdvanced(true);
     };
     const setAllColors = (color: QRState["dotColor"]) => {
         recreateIfModeChanged(opts.dotColor, color);
@@ -43,7 +72,7 @@ export default function QRColorGroup({ opts, onChange, onForceRecreate }: Props)
                 title={t("common.color")}
                 advanced={advanced}
                 label={t("common.advanced")}
-                onToggle={() => setAdvanced((v) => !v)}
+                onToggle={toggleAdvanced}
             />
             {!advanced ? (
                 <ColorSection label={t("qr.allColor")} cfg={opts.dotColor} onChange={setAllColors} />

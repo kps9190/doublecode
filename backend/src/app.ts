@@ -20,14 +20,14 @@ export class DoubleCodeApiServer {
         try {
             const route = parseCommentRoute(req);
             if (!route) {
-                sendJson(res, 404, { error: "not_found" });
+                sendJson(req, res, 404, { error: "not_found" });
                 return;
             }
 
             await this.comments.handle(req, res, route);
         } catch (error) {
             const statusCode = Number((error as Partial<HttpError>).statusCode || 500);
-            sendJson(res, statusCode, {
+            sendJson(req, res, statusCode, {
                 error: error instanceof Error ? error.message : "server_error",
             });
         }

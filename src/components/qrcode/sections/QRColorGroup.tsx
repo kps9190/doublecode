@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import type { ColorConfig, QRState } from "../../../types";
+import { applyColorToAllQRParts, cloneQRColorState, type QRColorKey, type QRColorState } from "../../../domain/qrcode/colorConfig";
 import { AdvancedSectionHeader, BackgroundField } from "../../ui";
 import ColorSection from "../ColorSection";
 import { useI18n } from "../../../i18n";
@@ -10,26 +11,11 @@ interface Props {
     onForceRecreate: () => void;
 }
 
-function cloneColorConfig(color: ColorConfig): ColorConfig {
-    return {
-        ...color,
-        gradient: { ...color.gradient },
-    };
-}
-
-function cloneColorState(opts: QRState) {
-    return {
-        dotColor: cloneColorConfig(opts.dotColor),
-        cornerSquareColor: cloneColorConfig(opts.cornerSquareColor),
-        cornerDotColor: cloneColorConfig(opts.cornerDotColor),
-    };
-}
-
 /** QR 점·모서리 색상 + 배경색 설정 섹션 */
 export default function QRColorGroup({ opts, onChange, onForceRecreate }: Props) {
     const { t } = useI18n();
     const [advanced, setAdvanced] = useState(false);
-    const basicColorSnapshotRef = useRef<ReturnType<typeof cloneColorState> | null>(null);
+    const basicColorSnapshotRef = useRef<QRColorState | null>(null);
     const recreateIfModeChanged = (prev: ColorConfig, next: ColorConfig) => {
         if (prev.mode !== next.mode) onForceRecreate();
     };
@@ -41,27 +27,19 @@ export default function QRColorGroup({ opts, onChange, onForceRecreate }: Props)
             setAdvanced(false);
 
             if (!snapshot) return;
-            onChange({
-                dotColor: cloneColorConfig(snapshot.dotColor),
-                cornerSquareColor: cloneColorConfig(snapshot.cornerSquareColor),
-                cornerDotColor: cloneColorConfig(snapshot.cornerDotColor),
-            });
+            onChange(cloneQRColorState(snapshot));
             recreateOnNextFrame();
             return;
         }
 
-        basicColorSnapshotRef.current = cloneColorState(opts);
+        basicColorSnapshotRef.current = cloneQRColorState(opts);
         setAdvanced(true);
     };
     const setAllColors = (color: QRState["dotColor"]) => {
         recreateIfModeChanged(opts.dotColor, color);
-        onChange({
-            dotColor: color,
-            cornerSquareColor: cloneColorConfig(color),
-            cornerDotColor: cloneColorConfig(color),
-        });
+        onChange(applyColorToAllQRParts(color));
     };
-    const setColor = (key: "dotColor" | "cornerSquareColor" | "cornerDotColor", color: ColorConfig) => {
+    const setColor = (key: QRColorKey, color: ColorConfig) => {
         recreateIfModeChanged(opts[key], color);
         onChange({ [key]: color });
     };

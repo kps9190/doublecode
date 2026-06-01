@@ -27,6 +27,12 @@ The server listens on `http://localhost:4000` by default.
 
 The frontend dev server proxies `/api` to this backend through `vite.config.ts`.
 
+`CORS_ORIGIN` accepts one or more comma-separated origins:
+
+```bash
+CORS_ORIGIN=https://doublecode.net,https://www.doublecode.net
+```
+
 ## API
 
 - `GET /api/comments`

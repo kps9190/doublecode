@@ -1,6 +1,6 @@
 import type { BarcodeState } from "../../../types";
 import { FONT_FAMILIES } from "../../../constants";
-import { FieldRow, RangeField, Toggle, SelectField, SegmentSelect, CheckboxPair, SectionTitle } from "../../ui";
+import { FieldRow, RangeField, Toggle, SelectField, SegmentSelect, CheckboxPair, SectionTitle, ColorField } from "../../ui";
 import { useI18n } from "../../../i18n";
 
 interface Props {
@@ -43,6 +43,7 @@ export default function BarcodeTextSection({ opts, onChange }: Props) {
             />
             <RangeField id="bc-fs" label={t("common.textSize")} min={8}   max={60} value={opts.fontSize}   onChange={(v) => onChange({ fontSize: v })} />
             <RangeField id="bc-tm" label={t("common.textMargin")} min={-10} max={40} value={opts.textMargin} onChange={(v) => onChange({ textMargin: v })} />
+            <ColorField label={t("common.textColor")} value={opts.textColor} onChange={(v) => onChange({ textColor: v })} />
         </>
     );
 }

@@ -7,6 +7,7 @@ export type BarcodeFontFamily   =
 export interface BarcodeState {
     format: string;
     lineColor: string;
+    textColor: string;
     background: string;
     transparentBg: boolean;
     width: number;

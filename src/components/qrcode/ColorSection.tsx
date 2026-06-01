@@ -1,6 +1,6 @@
 import type { ColorConfig } from "../../types";
 import { useI18n } from "../../i18n";
-import RangeField from "../ui/RangeField";
+import { ColorModeButton, GradientControls } from "../code";
 
 interface Props {
     label: string;
@@ -13,6 +13,8 @@ export default function ColorSection({ label, cfg, onChange, compact = false }: 
     const { t } = useI18n();
     const set     = (patch: Partial<ColorConfig>) => onChange({ ...cfg, ...patch });
     const setGrad = (patch: Partial<ColorConfig["gradient"]>) => onChange({ ...cfg, gradient: { ...cfg.gradient, ...patch } });
+    const solidActive = cfg.mode === "solid";
+    const gradientActive = cfg.mode === "gradient";
 
     return (
         <div className="border-b last:border-b-0 border-slate-200 py-2 dark:border-slate-700">
@@ -24,7 +26,7 @@ export default function ColorSection({ label, cfg, onChange, compact = false }: 
                     <label
                         onClick={() => set({ mode: "solid" })}
                         className={`relative inline-flex h-7 cursor-pointer items-center gap-2 overflow-hidden rounded-lg border px-2.5 text-xs transition-colors ${
-                            cfg.mode === "solid"
+                            solidActive
                                 ? "border-blue-600 bg-blue-600 text-white"
                                 : "border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
                         }`}
@@ -40,39 +42,16 @@ export default function ColorSection({ label, cfg, onChange, compact = false }: 
                             className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                         />
                     </label>
-                    <button
-                        type="button"
-                        onClick={() => set({ mode: "gradient" })}
-                        className={`h-7 rounded-lg border px-2.5 text-xs transition-colors ${
-                            cfg.mode === "gradient"
-                                ? "border-blue-600 bg-blue-600 text-white"
-                                : "border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700"
-                        }`}
-                    >
+                    <ColorModeButton active={gradientActive} onClick={() => set({ mode: "gradient" })}>
                         {t("color.gradient")}
-                    </button>
-                    {cfg.mode === "gradient" && (
-                        <>
-                            <select
-                                value={cfg.gradient.type}
-                                onChange={(e) => setGrad({ type: e.target.value as ColorConfig["gradient"]["type"] })}
-                                className="h-7 rounded-lg border border-slate-300 bg-white px-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                            >
-                                <option value="linear">{t("color.linear")}</option>
-                                <option value="radial">{t("color.radial")}</option>
-                            </select>
-                            <input type="color" value={cfg.gradient.color1} onChange={(e) => setGrad({ color1: e.target.value })} className="h-7 w-9 cursor-pointer rounded border border-slate-300 p-0.5 bg-transparent dark:border-slate-600" />
-                            <input type="color" value={cfg.gradient.color2} onChange={(e) => setGrad({ color2: e.target.value })} className="h-7 w-9 cursor-pointer rounded border border-slate-300 p-0.5 bg-transparent dark:border-slate-600" />
-                            <div className="min-w-44 flex-1">
-                                <RangeField
-                                    id={`${label}-rotation`}
-                                    min={0}
-                                    max={360}
-                                    value={cfg.gradient.rotation}
-                                    onChange={(rotation) => setGrad({ rotation })}
-                                />
-                            </div>
-                        </>
+                    </ColorModeButton>
+                    {gradientActive && (
+                        <GradientControls
+                            id={`${label}-rotation`}
+                            value={cfg.gradient}
+                            onChange={setGrad}
+                            t={t}
+                        />
                     )}
                 </div>
             </div>

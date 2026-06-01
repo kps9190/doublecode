@@ -1,7 +1,9 @@
 import type { FeedbackComment } from "../../types/comments";
 import type { Language } from "../../i18n";
 import { getCommentUpdateValidationError } from "../../domain/comments/commentRules";
-import UIButton from "../ui/UIButton";
+import CommentActionButton from "./CommentActionButton";
+import CommentBodyField from "./CommentBodyField";
+import CommentFormActions from "./CommentFormActions";
 import CommentPasswordDialog from "./CommentPasswordDialog";
 import { CommentAuthorLine, CommentStatusBadges } from "./CommentMeta";
 import type { ActiveCommentEditor } from "./commentEditorState";
@@ -67,25 +69,28 @@ export default function FeedbackCommentItem({
                         <CommentStatusBadges className="!mt-0 hidden justify-end md:flex" comment={comment} language={language} t={t} />
                         {!comment.deleted && !editor.isEditOpen && (
                             <div className="flex gap-2">
-                                <button type="button" className="text-xs font-medium text-slate-500 dark:text-slate-400" onClick={() => editor.toggleEditor("edit-password")}>
+                                <CommentActionButton onClick={() => editor.toggleEditor("edit-password")}>
                                     {t("comments.edit")}
-                                </button>
-                                <button type="button" className="text-xs font-medium text-slate-500 dark:text-slate-400" onClick={() => editor.toggleEditor("delete")}>
+                                </CommentActionButton>
+                                <CommentActionButton onClick={() => editor.toggleEditor("delete")}>
                                     {t("comments.delete")}
-                                </button>
+                                </CommentActionButton>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {editor.isEditOpen ? (
-                    <textarea
-                        value={editor.editBody}
-                        maxLength={maxLength}
-                        autoFocus
-                        onChange={(event) => editor.setEditBody(event.target.value)}
-                        className="mt-2 min-h-24 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm leading-6 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-                    />
+                    <div className="mt-2">
+                        <CommentBodyField
+                            disabled={submitting}
+                            maxLength={maxLength}
+                            value={editor.editBody}
+                            autoFocus
+                            onChange={editor.setEditBody}
+                            t={t}
+                        />
+                    </div>
                 ) : (
                     <p className={`mt-2 whitespace-pre-wrap break-words text-sm leading-6 ${
                         comment.deleted ? "text-slate-400 dark:text-slate-500" : "text-slate-600 dark:text-slate-300"
@@ -96,9 +101,9 @@ export default function FeedbackCommentItem({
 
                 {!comment.deleted && !editor.isEditOpen && (
                     <div className="mt-3 flex gap-2">
-                        <button type="button" className="text-xs font-medium text-blue-600 dark:text-cyan-300" onClick={() => editor.toggleEditor("reply")}>
+                        <CommentActionButton tone="primary" onClick={() => editor.toggleEditor("reply")}>
                             {t("comments.reply")}
-                        </button>
+                        </CommentActionButton>
                     </div>
                 )}
 
@@ -116,15 +121,14 @@ export default function FeedbackCommentItem({
                 )}
 
                 {editor.isEditOpen && (
-                    <div className="mt-2 flex flex-nowrap items-center justify-end gap-2">
-                        <UIButton size="sm" disabled={submitting} onClick={editor.closeEditor} className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs">
-                            {t("comments.cancel")}
-                        </UIButton>
-                        <UIButton
-                            size="sm"
-                            variant="solid"
-                            disabled={submitting || !editor.editBody.trim()}
-                            onClick={() => {
+                    <div className="mt-2">
+                        <CommentFormActions
+                            cancelLabel={t("comments.cancel")}
+                            disabled={submitting}
+                            primaryDisabled={!editor.editBody.trim()}
+                            primaryLabel={t("comments.edit")}
+                            onCancel={editor.closeEditor}
+                            onPrimary={() => {
                                 const validationError = getCommentUpdateValidationError(editor.editPassword, editor.editBody);
                                 if (validationError) {
                                     window.alert(t(validationError));
@@ -133,10 +137,7 @@ export default function FeedbackCommentItem({
 
                                 void editor.editComment();
                             }}
-                            className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs"
-                        >
-                            {t("comments.edit")}
-                        </UIButton>
+                        />
                     </div>
                 )}
 

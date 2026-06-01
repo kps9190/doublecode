@@ -10,11 +10,18 @@ if (existsSync(envPath)) {
     loadEnvFile(envPath);
 }
 
+function parseCorsOrigins(value: string | undefined): string[] {
+    return (value || "http://localhost:5173")
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+}
+
 export const config = {
     port: Number(process.env.PORT || 4000),
     backendRoot,
     databaseUrl: process.env.DATABASE_URL || "",
     passwordPepper: process.env.PASSWORD_PEPPER || "doublecode-dev-password-pepper",
     ipHashSecret: process.env.IP_HASH_SECRET || "doublecode-dev-ip-secret",
-    corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    corsOrigins: parseCorsOrigins(process.env.CORS_ORIGIN),
 };

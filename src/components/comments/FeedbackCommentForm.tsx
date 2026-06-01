@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { COMMENT_LIMITS, getNewCommentValidationError } from "../../domain/comments/commentRules";
-import UIButton from "../ui/UIButton";
+import CommentBodyField from "./CommentBodyField";
+import CommentFormActions from "./CommentFormActions";
+import CommentTextField from "./CommentTextField";
 
 interface Props {
     disabled: boolean;
@@ -9,26 +11,6 @@ interface Props {
     onSubmit: (authorName: string, password: string, body: string) => Promise<boolean>;
     submitLabel?: string;
     t: (key: string) => string;
-}
-
-interface ClearButtonProps {
-    disabled: boolean;
-    onClear: () => void;
-    t: (key: string) => string;
-}
-
-function FieldClearButton({ disabled, onClear, t }: ClearButtonProps) {
-    return (
-        <button
-            type="button"
-            aria-label={t("comments.clear")}
-            disabled={disabled}
-            onClick={onClear}
-            className="absolute right-2 top-1/2 hidden h-6 w-6 -translate-y-1/2 place-items-center rounded-full text-sm leading-none text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:grid focus:outline-none disabled:pointer-events-none dark:hover:bg-slate-700 dark:hover:text-slate-100 group-focus-within:grid"
-        >
-            ×
-        </button>
-    );
 }
 
 export default function FeedbackCommentForm({ disabled, maxLength, onCancel, onSubmit, submitLabel, t }: Props) {
@@ -74,58 +56,42 @@ export default function FeedbackCommentForm({ disabled, maxLength, onCancel, onS
     return (
         <div className="space-y-2">
             <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] gap-2">
-                <div className="group relative">
-                    <input
-                        type="text"
-                        value={authorName}
-                        maxLength={COMMENT_LIMITS.authorName}
-                        onChange={(e) => setAuthorName(e.target.value)}
-                        placeholder={t("comments.namePlaceholder")}
-                        aria-required="true"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    {authorName && <FieldClearButton disabled={disabled} onClear={() => setAuthorName("")} t={t} />}
-                </div>
-                <div className="group relative">
-                    <input
-                        type="password"
-                        value={password}
-                        maxLength={COMMENT_LIMITS.password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={t("comments.passwordPlaceholder")}
-                        aria-required="true"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    {password && <FieldClearButton disabled={disabled} onClear={() => setPassword("")} t={t} />}
-                </div>
-            </div>
-            <div className="group relative">
-                <textarea
-                    value={body}
-                    maxLength={maxLength}
-                    onChange={(e) => setBody(e.target.value)}
-                    placeholder={t("comments.bodyPlaceholder")}
-                    className="min-h-24 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 pb-7 pr-9 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                <CommentTextField
+                    ariaRequired
+                    disabled={disabled}
+                    maxLength={COMMENT_LIMITS.authorName}
+                    value={authorName}
+                    placeholder={t("comments.namePlaceholder")}
+                    onChange={setAuthorName}
+                    t={t}
                 />
-                {body && <FieldClearButton disabled={disabled} onClear={() => setBody("")} t={t} />}
-                <span className="pointer-events-none absolute bottom-2 right-3 rounded bg-white/90 px-1.5 text-[11px] tabular-nums text-slate-400 dark:bg-slate-800/90 dark:text-slate-500">
-                    {body.length}/{maxLength}
-                </span>
+                <CommentTextField
+                    ariaRequired
+                    disabled={disabled}
+                    maxLength={COMMENT_LIMITS.password}
+                    type="password"
+                    value={password}
+                    placeholder={t("comments.passwordPlaceholder")}
+                    onChange={setPassword}
+                    t={t}
+                />
             </div>
-            <div className="flex flex-nowrap items-center justify-end gap-2">
-                <UIButton size="sm" disabled={disabled} onClick={cancel} className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs">
-                    {t("comments.cancel")}
-                </UIButton>
-                <UIButton
-                    size="sm"
-                    variant="solid"
-                    disabled={!canSubmit}
-                    onClick={submit}
-                    className="h-8 !w-auto min-w-0 whitespace-nowrap px-3 text-xs"
-                >
-                    {disabled ? t("comments.sending") : submitLabel || t("comments.submit")}
-                </UIButton>
-            </div>
+            <CommentBodyField
+                disabled={disabled}
+                maxLength={maxLength}
+                value={body}
+                placeholder={t("comments.bodyPlaceholder")}
+                onChange={setBody}
+                t={t}
+            />
+            <CommentFormActions
+                cancelLabel={t("comments.cancel")}
+                disabled={disabled}
+                primaryDisabled={!canSubmit}
+                primaryLabel={disabled ? t("comments.sending") : submitLabel || t("comments.submit")}
+                onCancel={cancel}
+                onPrimary={submit}
+            />
         </div>
     );
 }

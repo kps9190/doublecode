@@ -3,7 +3,7 @@ import JsBarcode from "jsbarcode";
 import type { BarcodeState, BarcodeReadyAPI } from "../../types";
 import { BarcodeDownloadService } from "../../utils";
 import { EMPTY_CODE_MESSAGE, UNSUPPORTED_BARCODE_MESSAGE } from "../../constants";
-import { buildBarcodeOptions, clearBarcodeSVG } from "./barcodePreviewConfig";
+import { applyBarcodeTextColor, buildBarcodeOptions, clearBarcodeSVG } from "./barcodePreviewConfig";
 import { useI18n } from "../../i18n";
 import { validateBarcodeData } from "../../utils/validation";
 
@@ -45,6 +45,7 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
         try {
             let isValid = true;
             JsBarcode(svg, codeData, buildBarcodeOptions(opts, (v) => { isValid = v; }));
+            applyBarcodeTextColor(svg, opts.textColor);
             reportError(isValid ? null : UNSUPPORTED_BARCODE_MESSAGE);
         } catch {
             clearBarcodeSVG(svg);

@@ -2,22 +2,31 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { config } from "./config.ts";
 import type { RequestMeta } from "./types.ts";
 
-export function sendJson(res: ServerResponse, statusCode: number, body: unknown): void {
-    res.writeHead(statusCode, {
-        "Content-Type": "application/json; charset=utf-8",
-        "Access-Control-Allow-Origin": config.corsOrigin,
+function getAllowedOrigin(req: IncomingMessage): string {
+    const requestOrigin = req.headers.origin;
+    if (requestOrigin && config.corsOrigins.includes(requestOrigin)) return requestOrigin;
+    return config.corsOrigins[0] || "null";
+}
+
+function corsHeaders(req: IncomingMessage) {
+    return {
+        "Access-Control-Allow-Origin": getAllowedOrigin(req),
         "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type,Accept",
+        "Vary": "Origin",
+    };
+}
+
+export function sendJson(req: IncomingMessage, res: ServerResponse, statusCode: number, body: unknown): void {
+    res.writeHead(statusCode, {
+        "Content-Type": "application/json; charset=utf-8",
+        ...corsHeaders(req),
     });
     res.end(JSON.stringify(body));
 }
 
-export function sendEmpty(res: ServerResponse, statusCode: number): void {
-    res.writeHead(statusCode, {
-        "Access-Control-Allow-Origin": config.corsOrigin,
-        "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type,Accept",
-    });
+export function sendEmpty(req: IncomingMessage, res: ServerResponse, statusCode: number): void {
+    res.writeHead(statusCode, corsHeaders(req));
     res.end();
 }
 

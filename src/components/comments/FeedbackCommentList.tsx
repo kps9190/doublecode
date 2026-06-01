@@ -3,6 +3,7 @@ import type { FeedbackComment } from "../../types/comments";
 import type { Language } from "../../i18n";
 import type { ActiveCommentEditor } from "./commentEditorState";
 import FeedbackCommentItem from "./FeedbackCommentItem";
+import CommentStateMessage from "./CommentStateMessage";
 
 interface Props {
     comments: FeedbackComment[];
@@ -34,27 +35,15 @@ export default function FeedbackCommentList({
     const [activeEditor, setActiveEditor] = useState<ActiveCommentEditor>(null);
 
     if (loading) {
-        return (
-            <p className="rounded-lg border border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                {t("comments.loading")}
-            </p>
-        );
+        return <CommentStateMessage>{t("comments.loading")}</CommentStateMessage>;
     }
 
     if (error) {
-        return (
-            <p className="rounded-lg border border-amber-200 px-4 py-5 text-center text-sm text-amber-700 dark:border-amber-900/70 dark:text-amber-300">
-                {t(error)}
-            </p>
-        );
+        return <CommentStateMessage tone="warning">{t(error)}</CommentStateMessage>;
     }
 
     if (!comments.length) {
-        return (
-            <p className="rounded-lg border border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
-                {t("comments.empty")}
-            </p>
-        );
+        return <CommentStateMessage>{t("comments.empty")}</CommentStateMessage>;
     }
 
     return (

@@ -53,6 +53,7 @@ export const BARCODE_HEIGHT_RANGE = {
 export const DEFAULT_BARCODE: BarcodeState = {
     format: "CODE128",
     lineColor: "#000000",
+    textColor: "#000000",
     background: "#ffffff",
     transparentBg: false,
     width: 2,

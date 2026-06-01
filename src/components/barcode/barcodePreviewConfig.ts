@@ -32,6 +32,14 @@ export function buildBarcodeOptions(
     };
 }
 
+export function applyBarcodeTextColor(svg: SVGSVGElement | null, color: string): void {
+    if (!svg) return;
+
+    svg.querySelectorAll("text").forEach((text) => {
+        text.setAttribute("fill", color);
+    });
+}
+
 export function clearBarcodeSVG(svg: SVGSVGElement | null): void {
     if (!svg) return;
 

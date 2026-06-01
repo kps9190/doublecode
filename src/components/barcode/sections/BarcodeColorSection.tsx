@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
 import type { BarcodeState } from "../../../types";
 import { BackgroundField, ColorField, SectionTitle } from "../../ui";
+import { useRestorableBackgroundColor } from "../../code";
 import { useI18n } from "../../../i18n";
 
 interface Props {
@@ -11,11 +11,7 @@ interface Props {
 /** 바코드 색·배경 색·투명 배경 설정 섹션 */
 export default function BarcodeColorSection({ opts, onChange }: Props) {
     const { t } = useI18n();
-    // 투명으로 전환하기 전 마지막 배경색 기억
-    const lastBgRef = useRef(opts.background);
-    useEffect(() => {
-        if (!opts.transparentBg) lastBgRef.current = opts.background;
-    }, [opts.transparentBg, opts.background]);
+    const { lastColor } = useRestorableBackgroundColor(opts.background, opts.transparentBg);
 
     return (
         <>
@@ -29,7 +25,7 @@ export default function BarcodeColorSection({ opts, onChange }: Props) {
                 onColorChange={(v) => onChange({ background: v })}
                 onTransparentChange={(v) => {
                     if (v) onChange({ transparentBg: true, background: "transparent" });
-                    else   onChange({ transparentBg: false, background: lastBgRef.current });
+                    else   onChange({ transparentBg: false, background: lastColor });
                 }}
             />
         </>

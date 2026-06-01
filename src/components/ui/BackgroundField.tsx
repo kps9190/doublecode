@@ -7,10 +7,10 @@ interface Props {
     onTransparentChange: (transparent: boolean) => void;
 }
 
-const COMPACT_SWITCH_WIDTH_CLASS = "w-20";
-const COMPACT_SWITCH_KNOB_ON_CLASS = "translate-x-12";
-const WIDE_SWITCH_WIDTH_CLASS = "w-[5.5rem]";
-const WIDE_SWITCH_KNOB_ON_CLASS = "translate-x-14";
+const COMPACT_SWITCH_WIDTH_CLASS = "w-16";
+const COMPACT_SWITCH_KNOB_ON_CLASS = "translate-x-9";
+const WIDE_SWITCH_WIDTH_CLASS = "w-[4.75rem]";
+const WIDE_SWITCH_KNOB_ON_CLASS = "translate-x-11";
 
 export default function BackgroundField({
     label,
@@ -57,7 +57,9 @@ export default function BackgroundField({
                             transparent ? switchKnobOnClass : "translate-x-1"
                         }`}
                     />
-                    <span className={`relative z-10 w-full whitespace-nowrap px-2 text-xs font-bold ${transparent ? "text-left" : "text-right"}`}>
+                    <span className={`relative z-10 w-full whitespace-nowrap px-1.5 text-xs font-bold ${
+                        transparent ? "translate-x-px text-left" : "-translate-x-0.5 text-right"
+                    }`}>
                         {transparentLabel}
                     </span>
                 </button>

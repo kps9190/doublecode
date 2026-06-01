@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCombinedInput, useBarcode, useQRCode, useSystemTheme, useMobileHostRedirect } from "./hooks";
+import { useCombinedInput, useBarcode, useQRCode, useSystemTheme } from "./hooks";
 import { Header, MobileLayout, DesktopLayout, Footer } from "./components/layout";
 import { BarcodeOptions }                          from "./components/barcode";
 import { QROptions }                               from "./components/qrcode";
@@ -8,7 +8,6 @@ import { I18nProvider }                            from "./i18n";
 
 export default function Screen() {
     const { dark, toggleDark } = useSystemTheme();
-    useMobileHostRedirect();
 
     return (
         <I18nProvider>

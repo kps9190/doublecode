@@ -5,6 +5,7 @@ import { BarcodeDownloadService } from "../../utils";
 import { EMPTY_CODE_MESSAGE, UNSUPPORTED_BARCODE_MESSAGE } from "../../constants";
 import { buildBarcodeOptions, clearBarcodeSVG } from "./barcodePreviewConfig";
 import { useI18n } from "../../i18n";
+import { validateBarcodeData } from "../../utils/validation";
 
 interface Props {
     codeData: string;
@@ -33,6 +34,12 @@ export default function BarcodePreview({ codeData, opts, onErrorChange, onReady 
         if (!svg || !hasBarcodeData) {
             clearBarcodeSVG(svg);
             reportError(null);
+            return;
+        }
+        const validationError = validateBarcodeData(codeData, opts.format);
+        if (validationError) {
+            clearBarcodeSVG(svg);
+            reportError(validationError);
             return;
         }
         try {

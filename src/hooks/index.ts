@@ -4,7 +4,6 @@ export { useQRState }       from "./useQRState";
 export { useQRView }        from "./useQRView";
 export { useQRCode }        from "./useQRCode";
 export { useSystemTheme }   from "./useSystemTheme";
-export { useMobileHostRedirect } from "./useMobileHostRedirect";
 
 export type { CombinedInputState } from "./useCombinedInput";
 export type { UseBarcodeReturn }   from "./useBarcode";

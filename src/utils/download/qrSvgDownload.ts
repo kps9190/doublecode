@@ -7,7 +7,7 @@ import type QRCodeStyling from "qr-code-styling";
 import type { QRTextDownloadOpts } from "../../types";
 import { blobToDownload } from "./triggerDownload";
 import { getQRSVG } from "./qrPngDownload";
-import { getQRDisplayText } from "../qrText";
+import { getQRDisplayText } from "../qrcode";
 
 type QRInstance = QRCodeStyling | null;
 interface SerializedQR {

@@ -4,7 +4,7 @@ import QRBorderPlugin, {
     type ExtensionOptions,
 } from "qr-border-plugin";
 import type QRCodeStyling from "qr-code-styling";
-import type { DecorationSide, QRBorderState } from "../types";
+import type { DecorationSide, QRBorderState } from "../../types";
 
 export const isQRBorderPluginEnabled =
     import.meta.env.VITE_ENABLE_QR_BORDER_PLUGIN === "true";

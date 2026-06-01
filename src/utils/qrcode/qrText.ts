@@ -1,4 +1,4 @@
-import type { QRTextDownloadOpts } from "../types";
+import type { QRTextDownloadOpts } from "../../types";
 
 export function getQRDisplayText(opts: QRTextDownloadOpts, value: string): string {
     return opts.useTextOverride ? opts.textOverride : value;

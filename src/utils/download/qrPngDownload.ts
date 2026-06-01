@@ -5,7 +5,7 @@
  */
 import type { QRTextDownloadOpts } from "../../types";
 import { blobToDownload } from "./triggerDownload";
-import { getQRDisplayText } from "../qrText";
+import { getQRDisplayText } from "../qrcode";
 
 export function downloadQRPNG(
     containerEl: HTMLElement | null,

@@ -1,5 +1,6 @@
 import type { FeedbackComment } from "../../types/comments";
 import type { Language } from "../../i18n";
+import { getCommentUpdateValidationError } from "../../domain/comments/commentRules";
 import UIButton from "../ui/UIButton";
 import CommentPasswordDialog from "./CommentPasswordDialog";
 import { CommentAuthorLine, CommentStatusBadges } from "./CommentMeta";
@@ -119,7 +120,21 @@ export default function FeedbackCommentItem({
                         <UIButton size="sm" disabled={submitting} onClick={editor.closeEditor} className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs">
                             {t("comments.cancel")}
                         </UIButton>
-                        <UIButton size="sm" variant="solid" disabled={submitting || !editor.editBody.trim()} onClick={editor.editComment} className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs">
+                        <UIButton
+                            size="sm"
+                            variant="solid"
+                            disabled={submitting || !editor.editBody.trim()}
+                            onClick={() => {
+                                const validationError = getCommentUpdateValidationError(editor.editPassword, editor.editBody);
+                                if (validationError) {
+                                    window.alert(t(validationError));
+                                    return;
+                                }
+
+                                void editor.editComment();
+                            }}
+                            className="h-8 !w-auto whitespace-nowrap px-2.5 text-xs"
+                        >
                             {t("comments.edit")}
                         </UIButton>
                     </div>

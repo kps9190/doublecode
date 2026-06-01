@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { COMMENT_LIMITS, isReservedAuthorName } from "../../domain/comments/commentRules";
+import { COMMENT_LIMITS, getNewCommentValidationError } from "../../domain/comments/commentRules";
 import UIButton from "../ui/UIButton";
 
 interface Props {
@@ -38,13 +38,8 @@ export default function FeedbackCommentForm({ disabled, maxLength, onCancel, onS
     const canSubmit = body.length <= maxLength && !disabled;
 
     const getValidationMessage = () => {
-        const trimmedAuthorName = authorName.trim();
-        if (!trimmedAuthorName) return t("comments.nameRequired");
-        if (isReservedAuthorName(trimmedAuthorName)) return t("comments.reservedName");
-        if (password.length < COMMENT_LIMITS.minPassword) return t("comments.passwordTooShort");
-        if (!body.trim()) return t("comments.bodyRequired");
-        if (body.length > maxLength) return t("comments.bodyTooLong");
-        return null;
+        const errorKey = getNewCommentValidationError(authorName, password, body);
+        return errorKey ? t(errorKey) : null;
     };
 
     const submit = async () => {
@@ -56,7 +51,10 @@ export default function FeedbackCommentForm({ disabled, maxLength, onCancel, onS
         }
 
         const submitted = await onSubmit(authorName, password, body);
-        if (!submitted) return;
+        if (!submitted) {
+            window.alert(t("comments.submitError"));
+            return;
+        }
 
         setAuthorName("");
         setPassword("");

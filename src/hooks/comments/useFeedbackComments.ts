@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { COMMENT_LIMITS, isReservedAuthorName } from "../../domain/comments/commentRules";
+import { COMMENT_LIMITS, isValidCommentUpdate, isValidNewComment, normalizeCommentDraft } from "../../domain/comments/commentRules";
 import { FeedbackCommentService } from "../../services/comments";
 import type { FeedbackComment } from "../../types/comments";
 
@@ -39,23 +39,15 @@ export function useFeedbackComments() {
     }, []);
 
     const submit = useCallback(async (authorName: string, password: string, body: string, parentId: string | null = null) => {
-        const trimmedName = authorName.trim();
-        const trimmedBody = body.trim();
-        if (
-            !trimmedName
-            || isReservedAuthorName(trimmedName)
-            || trimmedName.length > COMMENT_LIMITS.authorName
-            || !trimmedBody
-            || trimmedBody.length > COMMENT_LIMITS.body
-            || password.length < COMMENT_LIMITS.minPassword
-            || password.length > COMMENT_LIMITS.password
-        ) return false;
+        if (!isValidNewComment(authorName, password, body)) return false;
+
+        const draft = normalizeCommentDraft(authorName, password, body);
 
         return runMutation(async () => {
             await service.create({
-                authorName: trimmedName,
-                password,
-                body: trimmedBody,
+                authorName: draft.authorName,
+                password: draft.password,
+                body: draft.body,
                 parentId,
             });
             await load();
@@ -80,11 +72,10 @@ export function useFeedbackComments() {
     }, [runMutation, service]);
 
     const update = useCallback(async (id: string, password: string, body: string) => {
-        const trimmedBody = body.trim();
-        if (!trimmedBody || trimmedBody.length > COMMENT_LIMITS.body || !password) return false;
+        if (!isValidCommentUpdate(password, body)) return false;
 
         return runMutation(async () => {
-            await service.update(id, { password, body: trimmedBody });
+            await service.update(id, { password, body: body.trim() });
             await load();
         }, "comments.updateError");
     }, [load, runMutation, service]);

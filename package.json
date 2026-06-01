@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "jsbarcode": "^3.12.1",
     "qr-border-plugin": "^0.1.1",
     "qr-code-styling": "^1.9.2",

@@ -24,15 +24,10 @@ export default function FeedbackComments() {
                     />
                 </div>
 
-                {comments.error && (
-                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                        {t(comments.error)}
-                    </p>
-                )}
-
                 <div>
                     <FeedbackCommentList
                         comments={comments.comments}
+                        error={comments.error}
                         language={language}
                         loading={comments.loading}
                         maxLength={comments.maxCommentLength}

@@ -6,6 +6,7 @@ import FeedbackCommentItem from "./FeedbackCommentItem";
 
 interface Props {
     comments: FeedbackComment[];
+    error: string;
     language: Language;
     loading: boolean;
     maxLength: number;
@@ -19,6 +20,7 @@ interface Props {
 
 export default function FeedbackCommentList({
     comments,
+    error,
     language,
     loading,
     maxLength,
@@ -32,11 +34,27 @@ export default function FeedbackCommentList({
     const [activeEditor, setActiveEditor] = useState<ActiveCommentEditor>(null);
 
     if (loading) {
-        return <p className="text-sm text-slate-500 dark:text-slate-400">{t("comments.loading")}</p>;
+        return (
+            <p className="rounded-lg border border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                {t("comments.loading")}
+            </p>
+        );
+    }
+
+    if (error) {
+        return (
+            <p className="rounded-lg border border-amber-200 px-4 py-5 text-center text-sm text-amber-700 dark:border-amber-900/70 dark:text-amber-300">
+                {t(error)}
+            </p>
+        );
     }
 
     if (!comments.length) {
-        return <p className="text-sm text-slate-500 dark:text-slate-400">{t("comments.empty")}</p>;
+        return (
+            <p className="rounded-lg border border-slate-200 px-4 py-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                {t("comments.empty")}
+            </p>
+        );
     }
 
     return (

@@ -1,5 +1,11 @@
 import type { CommentDto, CommentRow } from "../types.ts";
 
+function toDateString(value: CommentRow["created_at"]): string | null {
+    if (!value) return null;
+    if (value instanceof Date) return value.toISOString().replace("T", " ").slice(0, 19);
+    return String(value);
+}
+
 export function toCommentDto(row: CommentRow): CommentDto {
     const deleted = row.status === "deleted";
 
@@ -10,26 +16,27 @@ export function toCommentDto(row: CommentRow): CommentDto {
         authorRole: row.author_role,
         body: deleted ? "" : row.body,
         deleted,
-        createdAt: row.created_at,
-        updatedAt: row.updated_at,
+        createdAt: toDateString(row.created_at) || "",
+        updatedAt: toDateString(row.updated_at),
         editCount: row.edit_count,
-        deletedAt: row.deleted_at,
+        deletedAt: toDateString(row.deleted_at),
         replies: [],
     };
 }
 
 export function buildCommentTree(rows: CommentRow[]): CommentDto[] {
-    const byId = new Map<number, CommentDto>();
+    const byId = new Map<string, CommentDto>();
     const roots: CommentDto[] = [];
 
-    for (const row of rows) byId.set(row.id, toCommentDto(row));
+    for (const row of rows) byId.set(String(row.id), toCommentDto(row));
 
     for (const row of rows) {
-        const comment = byId.get(row.id);
+        const comment = byId.get(String(row.id));
         if (!comment) continue;
 
-        if (row.parent_id && byId.has(row.parent_id)) {
-            byId.get(row.parent_id)?.replies.push(comment);
+        const parentId = row.parent_id === null ? null : String(row.parent_id);
+        if (parentId && byId.has(parentId)) {
+            byId.get(parentId)?.replies.push(comment);
         } else {
             roots.push(comment);
         }

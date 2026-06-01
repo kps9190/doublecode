@@ -28,13 +28,13 @@ export class CommentController {
         }
 
         if (req.method === "GET" && route.id === null) {
-            sendJson(res, 200, this.service.list());
+            sendJson(res, 200, await this.service.list());
             return;
         }
 
         if (req.method === "POST" && route.id === null) {
             const input = await readJson<CreateCommentInput>(req);
-            sendJson(res, 201, this.service.create(input, getRequestMeta(req)));
+            sendJson(res, 201, await this.service.create(input, getRequestMeta(req)));
             return;
         }
 
@@ -54,19 +54,19 @@ export class CommentController {
     ): Promise<void> {
         if (req.method === "POST" && action === "verify-password") {
             const input = await readJson<PasswordInput>(req);
-            sendJson(res, 200, this.service.verifyPassword(commentId, input.password));
+            sendJson(res, 200, await this.service.verifyPassword(commentId, input.password));
             return;
         }
 
         if (req.method === "PATCH" && action === null) {
             const input = await readJson<UpdateCommentInput>(req);
-            sendJson(res, 200, this.service.update(commentId, input, getRequestMeta(req)));
+            sendJson(res, 200, await this.service.update(commentId, input, getRequestMeta(req)));
             return;
         }
 
         if (req.method === "DELETE" && action === null) {
             const input = await readJson<PasswordInput>(req);
-            this.service.delete(commentId, input.password);
+            await this.service.delete(commentId, input.password);
             sendEmpty(res, 204);
             return;
         }

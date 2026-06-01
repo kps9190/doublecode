@@ -1,22 +1,24 @@
 export type AuthorRole = "user" | "owner";
 export type CommentStatus = "visible" | "deleted" | "hidden";
+export type DatabaseId = number | string;
+export type DatabaseDate = string | Date | null;
 
 export interface CommentRow {
-    id: number;
-    parent_id: number | null;
+    id: DatabaseId;
+    parent_id: DatabaseId | null;
     author_name: string | null;
     author_role: AuthorRole;
     password_hash: string;
     body: string;
     status: CommentStatus;
-    created_at: string;
-    updated_at: string | null;
+    created_at: DatabaseDate;
+    updated_at: DatabaseDate;
     edit_count: number;
-    deleted_at: string | null;
+    deleted_at: DatabaseDate;
 }
 
 export interface PasswordCommentRow {
-    id: number;
+    id: DatabaseId;
     password_hash: string;
 }
 

@@ -1,4 +1,4 @@
-import { db, runTransaction } from "../db.ts";
+import { pool, runTransaction } from "../db.ts";
 import type { CommentDto, CommentRow, PasswordCommentRow } from "../types.ts";
 import { buildCommentTree, toCommentDto } from "./commentMapper.ts";
 
@@ -23,97 +23,96 @@ interface UpdateCommentBodyArgs {
 }
 
 export class CommentRepository {
-    listTree(): CommentDto[] {
-        const rows = db.prepare(`
+    async listTree(): Promise<CommentDto[]> {
+        const result = await pool.query<CommentRow>(`
             SELECT ${commentColumns}
             FROM feedback_comments
             WHERE status != 'hidden'
-            ORDER BY datetime(created_at) ASC, id ASC
-        `).all() as unknown as CommentRow[];
-        return buildCommentTree(rows);
+            ORDER BY created_at ASC, id ASC
+        `);
+        return buildCommentTree(result.rows);
     }
 
-    findVisiblePasswordRow(id: number): PasswordCommentRow | undefined {
-        return db.prepare(`
+    async findVisiblePasswordRow(id: number): Promise<PasswordCommentRow | undefined> {
+        const result = await pool.query<PasswordCommentRow>(`
             SELECT id, password_hash
             FROM feedback_comments
-            WHERE id = ? AND status = 'visible'
+            WHERE id = $1 AND status = 'visible'
             LIMIT 1
-        `).get(id) as PasswordCommentRow | undefined;
+        `, [id]);
+        return result.rows[0];
     }
 
-    findDto(id: number): CommentDto | null {
-        const row = db.prepare(`
+    async findDto(id: number): Promise<CommentDto | null> {
+        const result = await pool.query<CommentRow>(`
             SELECT ${commentColumns}
             FROM feedback_comments
-            WHERE id = ?
+            WHERE id = $1
             LIMIT 1
-        `).get(id) as CommentRow | undefined;
+        `, [id]);
+        const row = result.rows[0];
         return row ? toCommentDto(row) : null;
     }
 
-    insert({ parentId, authorName, passwordHash, body, ipHash, userAgent }: InsertCommentArgs): number {
-        const insert = db.prepare(`
-            INSERT INTO feedback_comments
-                (parent_id, author_name, author_role, password_hash, body, status, ip_hash, user_agent)
-            VALUES (?, ?, 'user', ?, ?, 'visible', ?, ?)
-        `);
+    async insert({ parentId, authorName, passwordHash, body, ipHash, userAgent }: InsertCommentArgs): Promise<number> {
+        return runTransaction(async (client) => {
+            const inserted = await client.query<{ id: string }>(`
+                INSERT INTO feedback_comments
+                    (parent_id, author_name, author_role, password_hash, body, status, ip_hash, user_agent)
+                VALUES ($1, $2, 'user', $3, $4, 'visible', $5, $6)
+                RETURNING id
+            `, [parentId, authorName, passwordHash, body, ipHash, userAgent]);
+            const commentId = Number(inserted.rows[0]?.id);
 
-        const insertRevision = db.prepare(`
-            INSERT INTO feedback_comment_revisions
-                (comment_id, revision_type, revision_no, previous_body, new_body, edited_at, ip_hash, user_agent)
-            VALUES (?, 'create', 0, NULL, ?, datetime('now'), ?, ?)
-        `);
+            await client.query(`
+                INSERT INTO feedback_comment_revisions
+                    (comment_id, revision_type, revision_no, previous_body, new_body, edited_at, ip_hash, user_agent)
+                VALUES ($1, 'create', 0, NULL, $2, now(), $3, $4)
+            `, [commentId, body, ipHash, userAgent]);
 
-        return runTransaction(() => {
-            const result = insert.run(parentId, authorName, passwordHash, body, ipHash, userAgent);
-            insertRevision.run(result.lastInsertRowid, body, ipHash, userAgent);
-            return Number(result.lastInsertRowid);
+            return commentId;
         });
     }
 
-    markDeleted(id: number): void {
-        db.prepare(`
+    async markDeleted(id: number): Promise<void> {
+        await pool.query(`
             UPDATE feedback_comments
-            SET status = 'deleted', deleted_at = datetime('now')
-            WHERE id = ? AND status = 'visible'
-        `).run(id);
+            SET status = 'deleted', deleted_at = now()
+            WHERE id = $1 AND status = 'visible'
+        `, [id]);
     }
 
-    updateBody({ id, body, userAgent }: UpdateCommentBodyArgs): void {
-        const insertRevision = db.prepare(`
-            INSERT INTO feedback_comment_revisions
-                (comment_id, revision_type, revision_no, previous_body, new_body, edited_at, ip_hash, user_agent)
-            SELECT
-                id,
-                'update',
-                edit_count + 1,
-                body,
-                ?,
-                datetime('now'),
-                ip_hash,
-                ?
-            FROM feedback_comments
-            WHERE id = ? AND status = 'visible'
-        `);
+    async updateBody({ id, body, userAgent }: UpdateCommentBodyArgs): Promise<void> {
+        await runTransaction(async (client) => {
+            await client.query(`
+                INSERT INTO feedback_comment_revisions
+                    (comment_id, revision_type, revision_no, previous_body, new_body, edited_at, ip_hash, user_agent)
+                SELECT
+                    id,
+                    'update',
+                    edit_count + 1,
+                    body,
+                    $1,
+                    now(),
+                    ip_hash,
+                    $2
+                FROM feedback_comments
+                WHERE id = $3 AND status = 'visible'
+            `, [body, userAgent, id]);
 
-        const update = db.prepare(`
-            UPDATE feedback_comments
-            SET body = ?,
-                updated_at = (
-                    SELECT edited_at
-                    FROM feedback_comment_revisions
-                    WHERE comment_id = ?
-                    ORDER BY id DESC
-                    LIMIT 1
-                ),
-                edit_count = edit_count + 1
-            WHERE id = ? AND status = 'visible'
-        `);
-
-        runTransaction(() => {
-            insertRevision.run(body, userAgent, id);
-            update.run(body, id, id);
+            await client.query(`
+                UPDATE feedback_comments
+                SET body = $1,
+                    updated_at = (
+                        SELECT edited_at
+                        FROM feedback_comment_revisions
+                        WHERE comment_id = $2
+                        ORDER BY id DESC
+                        LIMIT 1
+                    ),
+                    edit_count = edit_count + 1
+                WHERE id = $3 AND status = 'visible'
+            `, [body, id, id]);
         });
     }
 }

@@ -39,7 +39,7 @@ Public comment creation always stores `author_role = 'user'`. Developer comments
 
 ## Data
 
-SQLite data is stored in `backend/data/feedback.sqlite` by default and is ignored by git.
+PostgreSQL is configured with `DATABASE_URL`. On Render, create a Postgres database and set the backend service's `DATABASE_URL` environment variable from Render's internal connection string.
 
 The backend stores:
 

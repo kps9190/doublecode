@@ -11,16 +11,16 @@ export class CommentService {
         this.repository = repository;
     }
 
-    list(): CommentDto[] {
+    async list(): Promise<CommentDto[]> {
         return this.repository.listTree();
     }
 
-    verifyPassword(id: number, password: string | undefined): { ok: true } {
-        this.assertPasswordMatches(id, password || "");
+    async verifyPassword(id: number, password: string | undefined): Promise<{ ok: true }> {
+        await this.assertPasswordMatches(id, password || "");
         return { ok: true };
     }
 
-    create(input: CreateCommentInput, requestMeta: RequestMeta): CommentDto | null {
+    async create(input: CreateCommentInput, requestMeta: RequestMeta): Promise<CommentDto | null> {
         const authorName = (input.authorName || "").trim();
         const password = input.password || "";
         const body = (input.body || "").trim();
@@ -31,7 +31,7 @@ export class CommentService {
             throw httpError(validationError || "invalid_parent_id", 400);
         }
 
-        const id = this.repository.insert({
+        const id = await this.repository.insert({
             parentId,
             authorName,
             passwordHash: hashPassword(password),
@@ -43,12 +43,12 @@ export class CommentService {
         return this.repository.findDto(id);
     }
 
-    delete(id: number, password: string | undefined): void {
-        this.assertPasswordMatches(id, password || "");
-        this.repository.markDeleted(id);
+    async delete(id: number, password: string | undefined): Promise<void> {
+        await this.assertPasswordMatches(id, password || "");
+        await this.repository.markDeleted(id);
     }
 
-    update(id: number, input: UpdateCommentInput, requestMeta: RequestMeta): CommentDto | null {
+    async update(id: number, input: UpdateCommentInput, requestMeta: RequestMeta): Promise<CommentDto | null> {
         const body = (input.body || "").trim();
         const validationError = validateUpdateComment({ body });
 
@@ -56,13 +56,13 @@ export class CommentService {
             throw httpError(validationError, 400);
         }
 
-        this.assertPasswordMatches(id, input.password || "");
-        this.repository.updateBody({ id, body, userAgent: requestMeta.userAgent });
+        await this.assertPasswordMatches(id, input.password || "");
+        await this.repository.updateBody({ id, body, userAgent: requestMeta.userAgent });
         return this.repository.findDto(id);
     }
 
-    private assertPasswordMatches(id: number, password: string): void {
-        const comment = this.repository.findVisiblePasswordRow(id);
+    private async assertPasswordMatches(id: number, password: string): Promise<void> {
+        const comment = await this.repository.findVisiblePasswordRow(id);
         if (!comment || !verifyPassword(password, comment.password_hash)) {
             throw httpError("invalid_password", 403);
         }

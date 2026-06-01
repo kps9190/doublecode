@@ -13,7 +13,7 @@ if (existsSync(envPath)) {
 export const config = {
     port: Number(process.env.PORT || 4000),
     backendRoot,
-    databasePath: resolve(backendRoot, process.env.SQLITE_DB_PATH || "data/feedback.sqlite"),
+    databaseUrl: process.env.DATABASE_URL || "",
     passwordPepper: process.env.PASSWORD_PEPPER || "doublecode-dev-password-pepper",
     ipHashSecret: process.env.IP_HASH_SECRET || "doublecode-dev-ip-secret",
     corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",

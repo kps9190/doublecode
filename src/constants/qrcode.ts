@@ -21,10 +21,10 @@ export const QR_CORNER_DOT_STYLES = [
 ] as const;
 
 export const EC_LEVELS = [
-    { value: "L", labelKey: "common.low" },
-    { value: "M", labelKey: "common.medium" },
-    { value: "Q", labelKey: "common.high" },
-    { value: "H", labelKey: "common.highest" },
+    { value: "L", labelKey: "qr.ecLow" },
+    { value: "M", labelKey: "qr.ecMedium" },
+    { value: "Q", labelKey: "qr.ecHigh" },
+    { value: "H", labelKey: "qr.ecHighest" },
 ] as const;
 
 export const QR_MODES = [

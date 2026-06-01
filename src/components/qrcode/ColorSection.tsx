@@ -1,5 +1,6 @@
 import type { ColorConfig } from "../../types";
 import { useI18n } from "../../i18n";
+import RangeField from "../ui/RangeField";
 
 interface Props {
     label: string;
@@ -62,9 +63,14 @@ export default function ColorSection({ label, cfg, onChange, compact = false }: 
                             </select>
                             <input type="color" value={cfg.gradient.color1} onChange={(e) => setGrad({ color1: e.target.value })} className="h-7 w-9 cursor-pointer rounded border border-slate-300 p-0.5 bg-transparent dark:border-slate-600" />
                             <input type="color" value={cfg.gradient.color2} onChange={(e) => setGrad({ color2: e.target.value })} className="h-7 w-9 cursor-pointer rounded border border-slate-300 p-0.5 bg-transparent dark:border-slate-600" />
-                            <div className="flex min-w-36 flex-1 items-center gap-2">
-                                <input type="range" min={0} max={360} value={cfg.gradient.rotation} onChange={(e) => setGrad({ rotation: Number(e.target.value) })} className="min-w-0 flex-1" />
-                                <span className="w-8 text-right text-xs tabular-nums text-slate-600 dark:text-slate-400">{cfg.gradient.rotation}°</span>
+                            <div className="min-w-44 flex-1">
+                                <RangeField
+                                    id={`${label}-rotation`}
+                                    min={0}
+                                    max={360}
+                                    value={cfg.gradient.rotation}
+                                    onChange={(rotation) => setGrad({ rotation })}
+                                />
                             </div>
                         </>
                     )}

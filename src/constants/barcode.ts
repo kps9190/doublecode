@@ -38,6 +38,18 @@ export const FONT_FAMILIES = [
 
 export const EAN_FORMATS = new Set(["EAN2", "EAN5", "EAN8", "EAN13", "UPC", "UPCE"]);
 
+export const BARCODE_LINE_WIDTH_RANGE = {
+    min: 1,
+    max: 20,
+    step: 0.5,
+} as const;
+
+export const BARCODE_HEIGHT_RANGE = {
+    min: 10,
+    max: 300,
+    step: 10,
+} as const;
+
 export const DEFAULT_BARCODE: BarcodeState = {
     format: "CODE128",
     lineColor: "#000000",

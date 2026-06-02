@@ -6,7 +6,6 @@ export const dictionaries: Record<Language, Dictionary> = {
     ko: {
         "app.title": "바코드 & QR코드 만들기",
         "app.subtitle": "한번의 입력으로 바코드와 QR코드를 동시에!!",
-        "app.footer": "DoubleCode · doublecode.net",
         "theme.light": "라이트 모드",
         "theme.dark": "다크 모드",
         "language.toggle": "English",
@@ -181,7 +180,6 @@ export const dictionaries: Record<Language, Dictionary> = {
     en: {
         "app.title": "Barcode & QR Code Generator",
         "app.subtitle": "Create barcodes and QR codes from one input.",
-        "app.footer": "DoubleCode · doublecode.net",
         "theme.light": "Light mode",
         "theme.dark": "Dark mode",
         "language.toggle": "한국어",

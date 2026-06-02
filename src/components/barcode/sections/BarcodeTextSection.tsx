@@ -1,6 +1,6 @@
 import type { BarcodeState } from "../../../types";
 import { FONT_FAMILIES } from "../../../constants";
-import { FieldRow, RangeField, Toggle, SelectField, SegmentSelect, CheckboxPair, SectionTitle, ColorField } from "../../ui";
+import { FieldRow, RangeField, Toggle, SelectField, SegmentSelect, TextStyleField, SectionTitle } from "../../ui";
 import { useI18n } from "../../../i18n";
 
 interface Props {
@@ -36,14 +36,15 @@ export default function BarcodeTextSection({ opts, onChange }: Props) {
                 <SegmentSelect value={opts.textPosition} options={textPositionOptions} onChange={(v) => onChange({ textPosition: v as BarcodeState["textPosition"] })} />
             </FieldRow>
             <SelectField label={t("common.font")} value={opts.font} options={FONT_FAMILIES} onChange={(v) => onChange({ font: v as BarcodeState["font"] })} />
-            <CheckboxPair
+            <TextStyleField
                 label={t("common.textStyle")}
                 boldChecked={opts.bold}     onBoldChange={(v) => onChange({ bold: v })}
                 italicChecked={opts.italic} onItalicChange={(v) => onChange({ italic: v })}
+                color={opts.textColor}
+                onColorChange={(v) => onChange({ textColor: v })}
             />
             <RangeField id="bc-fs" label={t("common.textSize")} min={8}   max={60} value={opts.fontSize}   onChange={(v) => onChange({ fontSize: v })} />
             <RangeField id="bc-tm" label={t("common.textMargin")} min={-10} max={40} value={opts.textMargin} onChange={(v) => onChange({ textMargin: v })} />
-            <ColorField label={t("common.textColor")} value={opts.textColor} onChange={(v) => onChange({ textColor: v })} />
         </>
     );
 }

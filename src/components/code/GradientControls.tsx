@@ -20,9 +20,11 @@ export default function GradientControls({ id, value, onChange, t }: Props) {
                 <option value="linear">{t("color.linear")}</option>
                 <option value="radial">{t("color.radial")}</option>
             </select>
-            <SmallColorInput value={value.color1} onChange={(color1) => onChange({ color1 })} />
-            <SmallColorInput value={value.color2} onChange={(color2) => onChange({ color2 })} />
-            <div className="min-w-44 flex-1">
+            <div className="inline-flex shrink-0 items-center gap-2">
+                <SmallColorInput value={value.color1} onChange={(color1) => onChange({ color1 })} />
+                <SmallColorInput value={value.color2} onChange={(color2) => onChange({ color2 })} />
+            </div>
+            <div className="min-w-28 flex-1 sm:min-w-36">
                 <RangeField
                     id={id}
                     min={0}

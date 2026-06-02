@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import QRCodeStyling from "qr-code-styling";
 import type { QRState, QRReadyAPI } from "../../types";
-import { applyQRBorderPlugin, validateQRData, QRDownloadService, clearQRContainer, getQRDisplayText } from "../../utils";
+import { applyQRBorder, validateQRData, QRDownloadService, clearQRContainer, getQRDisplayText } from "../../utils";
 import { EMPTY_CODE_MESSAGE, UNSUPPORTED_QR_MESSAGE } from "../../constants";
 import { buildQRConfig, buildQRTextStyle } from "./qrPreviewConfig";
 import { useI18n } from "../../i18n";
@@ -57,7 +57,7 @@ export default function QRPreview({ codeData, opts, onReady, onWarning }: Props)
             } else {
                 qrRef.current?.update(config);
             }
-            applyQRBorderPlugin(qrRef.current, opts.border);
+            applyQRBorder(qrRef.current, opts);
             setError(null);
         } catch {
             const message = UNSUPPORTED_QR_MESSAGE;

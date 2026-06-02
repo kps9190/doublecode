@@ -25,11 +25,13 @@ function colorOrGradient(config: ColorConfig) {
 }
 
 export function buildQRConfig(opts: QRState, data: string): Partial<Options> {
+    const borderInset = getQRBorderInset(opts);
+
     return {
         type: "svg",
         width: opts.width,
         height: opts.height,
-        margin: opts.margin,
+        margin: opts.margin + borderInset,
         data,
         qrOptions: {
             typeNumber: opts.typeNumber as QROptions["typeNumber"],
@@ -49,7 +51,7 @@ export function buildQRConfig(opts: QRState, data: string): Partial<Options> {
             ...colorOrGradient(opts.cornerDotColor),
         },
         backgroundOptions: {
-            color: opts.transparentBg ? "transparent" : opts.backgroundColor,
+            color: opts.transparentBg || opts.border.enabled ? "transparent" : opts.backgroundColor,
         },
         ...(opts.image
             ? {
@@ -58,6 +60,18 @@ export function buildQRConfig(opts: QRState, data: string): Partial<Options> {
               }
             : {}),
     };
+}
+
+function getQRBorderInset(opts: QRState): number {
+    if (!opts.border.enabled) return 0;
+
+    const shortestSide = Math.min(opts.width, opts.height);
+    const thickness = Math.min(opts.border.thickness, Math.max(0, Math.floor(shortestSide * 0.35)));
+    const innerSize = Math.max(0, shortestSide - thickness * 2);
+    const innerRadius = (innerSize / 2) * opts.border.round;
+    const cornerSafeInset = Math.ceil(innerRadius * (1 - 1 / Math.SQRT2));
+
+    return thickness + cornerSafeInset;
 }
 
 export function buildQRTextStyle(opts: QRState): CSSProperties {

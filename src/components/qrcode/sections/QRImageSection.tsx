@@ -60,7 +60,7 @@ export default function QRImageSection({ opts, onChange }: Props) {
             </FieldRow>
             {opts.image && (
                 <>
-                    <RangeField id="qr-is" label={t("qr.imageSize")} min={0.2} max={0.6} step={0.05} value={opts.imageSize} onChange={(v) => onChange({ imageSize: v })} />
+                    <RangeField id="qr-is" label={t("qr.imageSize")} min={0.1} max={2} step={0.01} value={opts.imageSize} onChange={(v) => onChange({ imageSize: v })} />
                     <RangeField id="qr-im" label={t("qr.imageMargin")} min={0} max={30} value={opts.imageMargin} onChange={(v) => onChange({ imageMargin: v })} />
                 </>
             )}

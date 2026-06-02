@@ -79,9 +79,9 @@ export const DEFAULT_QR: QRState = {
     border: {
         enabled: false,
         thickness: 40, color: "#111827", round: 0, dash: "",
-        decoTop:    makeDefaultDeco("SCAN ME"),
-        decoBottom: makeDefaultDeco(""),
-        decoLeft:   makeDefaultDeco(""),
-        decoRight:  makeDefaultDeco(""),
+        decoTop:    makeDefaultDeco("Top Text"),
+        decoBottom: makeDefaultDeco("Bottom Text"),
+        decoLeft:   makeDefaultDeco("Left Text"),
+        decoRight:  makeDefaultDeco("Right Text"),
     },
 };

@@ -1,5 +1,5 @@
 import { useI18n } from "../../i18n";
-import { CheckboxPair, ColorField, FieldRow, RangeField, SectionTitle, SegmentSelect, SelectField, Toggle } from "../ui";
+import { FieldRow, RangeField, SectionTitle, SegmentSelect, SelectField, TextStyleField, Toggle } from "../ui";
 import CodeTextOverrideInput from "./CodeTextOverrideInput";
 
 type CodeTextAlign = "left" | "center" | "right";
@@ -79,12 +79,14 @@ export default function CodeTextSection({ fontOptions, idPrefix, value, textMarg
                 options={fontOptions}
                 onChange={(font) => onChange({ font })}
             />
-            <CheckboxPair
+            <TextStyleField
                 label={t("common.textStyle")}
                 boldChecked={value.bold}
                 italicChecked={value.italic}
                 onBoldChange={(bold) => onChange({ bold })}
                 onItalicChange={(italic) => onChange({ italic })}
+                color={value.textColor}
+                onColorChange={(textColor) => onChange({ textColor })}
             />
             <RangeField
                 id={`${idPrefix}-fs`}
@@ -102,13 +104,6 @@ export default function CodeTextSection({ fontOptions, idPrefix, value, textMarg
                 value={value.textMargin}
                 onChange={(textMargin) => onChange({ textMargin })}
             />
-            {value.textColor !== undefined && (
-                <ColorField
-                    label={t("common.textColor")}
-                    value={value.textColor}
-                    onChange={(textColor) => onChange({ textColor })}
-                />
-            )}
         </>
     );
 }

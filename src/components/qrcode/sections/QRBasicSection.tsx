@@ -32,7 +32,10 @@ export default function QRBasicSection({ opts, onChange, onForceRecreate }: Prop
                 label={t("qr.mode")}
                 value={opts.mode}
                 options={QR_MODES.map((o) => ({ value: o.value, label: t(o.labelKey) }))}
-                onChange={(v) => onChange({ mode: v as QRState["mode"] })}
+                onChange={(v) => {
+                    onChange({ mode: v as QRState["mode"] });
+                    onForceRecreate();
+                }}
             />
         </>
     );

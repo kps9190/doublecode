@@ -11,18 +11,21 @@ const ICON_SWITCH_WIDTH_CLASS = "w-11";
 const ICON_SWITCH_KNOB_ON_CLASS = "translate-x-4";
 const COMPACT_SWITCH_WIDTH_CLASS = "w-12";
 const COMPACT_SWITCH_KNOB_ON_CLASS = "translate-x-5";
+const DEFAULT_SWITCH_WIDTH_CLASS = "w-[4.75rem]";
+const DEFAULT_SWITCH_KNOB_ON_CLASS = "translate-x-11";
 const WIDE_SWITCH_WIDTH_CLASS = "w-[5.5rem]";
 const WIDE_SWITCH_KNOB_ON_CLASS = "translate-x-[3.75rem]";
 const COMPACT_LABELS = new Set(["↑", "↓", "←", "→"]);
+const WIDE_LABELS = new Set(["비활성화", "Disable"]);
 
 export default function LabeledSwitch({ checked, label, onChange, ariaLabel, hideLabel = false, className = "" }: Props) {
     const isCompactSwitch = !hideLabel && COMPACT_LABELS.has(label);
     const switchWidthClass = hideLabel
         ? ICON_SWITCH_WIDTH_CLASS
-        : isCompactSwitch ? COMPACT_SWITCH_WIDTH_CLASS : WIDE_SWITCH_WIDTH_CLASS;
+        : isCompactSwitch ? COMPACT_SWITCH_WIDTH_CLASS : WIDE_LABELS.has(label) ? WIDE_SWITCH_WIDTH_CLASS : DEFAULT_SWITCH_WIDTH_CLASS;
     const switchKnobOnClass = hideLabel
         ? ICON_SWITCH_KNOB_ON_CLASS
-        : isCompactSwitch ? COMPACT_SWITCH_KNOB_ON_CLASS : WIDE_SWITCH_KNOB_ON_CLASS;
+        : isCompactSwitch ? COMPACT_SWITCH_KNOB_ON_CLASS : WIDE_LABELS.has(label) ? WIDE_SWITCH_KNOB_ON_CLASS : DEFAULT_SWITCH_KNOB_ON_CLASS;
 
     return (
         <button

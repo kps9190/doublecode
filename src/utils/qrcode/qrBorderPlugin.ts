@@ -2,6 +2,7 @@ import type QRCodeStyling from "qr-code-styling";
 import type { ColorConfig, DecorationSide, QRState } from "../../types";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
+let fillerClipIdSeed = 0;
 
 type QRCodeOptions = {
     width?: number;
@@ -65,19 +66,21 @@ function addFillerDots(
     insertBefore: ChildNode | null
 ): void {
     const moduleSize = Math.max(2, estimateModuleSize(svg, qrBounds));
-    const gap = moduleSize;
-    const quiet = Math.max(1, Math.min(opts.margin, moduleSize * 0.5));
+    const gap = moduleSize * 0.85;
+    const dotSize = Math.max(1, moduleSize * 0.56);
+    const dotRadius = dotSize / 2;
+    const quiet = Math.max(1, Math.min(opts.margin, moduleSize * 0.5)) + dotRadius;
     const protectedQR = expandBounds(qrBounds, quiet);
     const color = resolveSolidColor(opts.dotColor);
     const group = createSvgElement("g");
+    const clipId = createFillerClipPath(svg, inner, innerRadius);
     group.setAttribute("fill", color);
     group.setAttribute("pointer-events", "none");
-
-    const dotSize = Math.max(1, moduleSize * 0.62);
+    group.setAttribute("clip-path", `url(#${clipId})`);
     let index = 0;
 
-    for (let y = inner.y + gap; y <= inner.y + inner.height - gap; y += gap) {
-        for (let x = inner.x + gap; x <= inner.x + inner.width - gap; x += gap) {
+    for (let y = inner.y + dotRadius; y <= inner.y + inner.height - dotRadius; y += gap) {
+        for (let x = inner.x + dotRadius; x <= inner.x + inner.width - dotRadius; x += gap) {
             if (isInsideBounds({ x, y }, protectedQR)) continue;
             if (!isInsideRoundedBounds({ x, y }, inner, innerRadius)) continue;
             if (!shouldPlaceFillerDot(x, y, index)) {
@@ -104,7 +107,20 @@ function addFillerDots(
 
 function shouldPlaceFillerDot(x: number, y: number, index: number): boolean {
     const noise = Math.sin(x * 12.9898 + y * 78.233 + index * 37.719) * 43758.5453;
-    return noise - Math.floor(noise) > 0.42;
+    return noise - Math.floor(noise) > 0.32;
+}
+
+function createFillerClipPath(svg: SVGElement, bounds: Bounds, radius: number): string {
+    const defs = getOrCreateDefs(svg);
+    const id = `qr-border-filler-clip-${fillerClipIdSeed++}`;
+    const clipPath = createSvgElement("clipPath");
+    const rect = createRoundedRect(bounds, radius, "#000000");
+
+    rect.removeAttribute("fill");
+    clipPath.setAttribute("id", id);
+    clipPath.appendChild(rect);
+    defs.appendChild(clipPath);
+    return id;
 }
 
 function createRoundedRect(bounds: Bounds, radius: number, fill: string): SVGRectElement {

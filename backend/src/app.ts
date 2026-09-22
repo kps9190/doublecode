@@ -27,8 +27,11 @@ export class DoubleCodeApiServer {
             await this.comments.handle(req, res, route);
         } catch (error) {
             const statusCode = Number((error as Partial<HttpError>).statusCode || 500);
+            if (statusCode >= 500) {
+                console.error("DoubleCode API error:", error);
+            }
             sendJson(req, res, statusCode, {
-                error: error instanceof Error ? error.message : "server_error",
+                error: statusCode >= 500 ? "server_error" : error instanceof Error ? error.message : "server_error",
             });
         }
     }

@@ -9,6 +9,8 @@ export const dictionaries: Record<Language, Dictionary> = {
         "theme.light": "라이트 모드",
         "theme.dark": "다크 모드",
         "language.toggle": "English",
+        "nav.tool": "도구",
+        "nav.guide": "사용법",
         "mobile.barcode": "바코드",
         "mobile.qr": "QR코드",
 
@@ -208,6 +210,8 @@ export const dictionaries: Record<Language, Dictionary> = {
         "theme.light": "Light mode",
         "theme.dark": "Dark mode",
         "language.toggle": "한국어",
+        "nav.tool": "Tool",
+        "nav.guide": "Guide",
         "mobile.barcode": "Barcode",
         "mobile.qr": "QR Code",
 

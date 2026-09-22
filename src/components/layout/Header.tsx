@@ -4,12 +4,14 @@ import { useI18n } from "../../i18n";
 
 interface Props {
     dark: boolean;
+    activePage: "tool" | "guide";
     activeMobileView: MobileCodeView;
+    onPageChange: (page: "tool" | "guide") => void;
     onMobileViewChange: (view: MobileCodeView) => void;
     onToggle: () => void;
 }
 
-export default function Header({ dark, activeMobileView, onMobileViewChange, onToggle }: Props) {
+export default function Header({ dark, activePage, activeMobileView, onPageChange, onMobileViewChange, onToggle }: Props) {
     const { language, t, toggleLanguage } = useI18n();
 
     return (
@@ -23,6 +25,7 @@ export default function Header({ dark, activeMobileView, onMobileViewChange, onT
                         {t("app.subtitle")}
                     </p>
                 </div>
+                <PageNav activePage={activePage} onPageChange={onPageChange} toolLabel={t("nav.tool")} guideLabel={t("nav.guide")} />
                 <HeaderActions
                     dark={dark}
                     languageLabel={language === "ko" ? "EN" : "KO"}
@@ -35,14 +38,19 @@ export default function Header({ dark, activeMobileView, onMobileViewChange, onT
                 />
             </div>
             <div className="mx-auto mt-7 flex w-full items-center gap-3 md:hidden">
-                <div className="grid min-w-0 flex-1 grid-cols-2 border-b border-slate-300 dark:border-slate-700">
-                    <MobileViewIcon active={activeMobileView === "barcode"} label={t("mobile.barcode")} onClick={() => onMobileViewChange("barcode")}>
-                        <BarcodeIcon />
-                    </MobileViewIcon>
-                    <MobileViewIcon active={activeMobileView === "qr"} label={t("mobile.qr")} onClick={() => onMobileViewChange("qr")}>
-                        <QRIcon />
-                    </MobileViewIcon>
-                </div>
+                {activePage === "tool" && (
+                    <div className="grid min-w-0 flex-1 grid-cols-2 border-b border-slate-300 dark:border-slate-700">
+                        <MobileViewIcon active={activeMobileView === "barcode"} label={t("mobile.barcode")} onClick={() => onMobileViewChange("barcode")}>
+                            <BarcodeIcon />
+                        </MobileViewIcon>
+                        <MobileViewIcon active={activeMobileView === "qr"} label={t("mobile.qr")} onClick={() => onMobileViewChange("qr")}>
+                            <QRIcon />
+                        </MobileViewIcon>
+                    </div>
+                )}
+                {activePage === "guide" && (
+                    <div className="min-w-0 flex-1" />
+                )}
                 <HeaderActions
                     dark={dark}
                     languageLabel={language === "ko" ? "EN" : "KO"}
@@ -55,6 +63,35 @@ export default function Header({ dark, activeMobileView, onMobileViewChange, onT
                 />
             </div>
         </header>
+    );
+}
+
+function PageNav({
+    activePage,
+    toolLabel,
+    guideLabel,
+    onPageChange,
+}: {
+    activePage: "tool" | "guide";
+    toolLabel: string;
+    guideLabel: string;
+    onPageChange: (page: "tool" | "guide") => void;
+}) {
+    const buttonClass = (page: "tool" | "guide") => `h-9 rounded-md px-4 text-sm font-semibold transition-colors ${
+        activePage === page
+            ? "bg-slate-950 text-white dark:bg-white dark:text-slate-950"
+            : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+    }`;
+
+    return (
+        <nav className="mx-auto mt-5 inline-flex rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/70" aria-label="Page">
+            <button type="button" className={buttonClass("tool")} onClick={() => onPageChange("tool")}>
+                {toolLabel}
+            </button>
+            <button type="button" className={buttonClass("guide")} onClick={() => onPageChange("guide")}>
+                {guideLabel}
+            </button>
+        </nav>
     );
 }
 

@@ -4,14 +4,13 @@ import { useI18n } from "../../i18n";
 
 interface Props {
     dark: boolean;
-    activePage: "tool" | "guide";
     activeMobileView: MobileCodeView;
-    onPageChange: (page: "tool" | "guide") => void;
+    onGuideOpen: () => void;
     onMobileViewChange: (view: MobileCodeView) => void;
     onToggle: () => void;
 }
 
-export default function Header({ dark, activePage, activeMobileView, onPageChange, onMobileViewChange, onToggle }: Props) {
+export default function Header({ dark, activeMobileView, onGuideOpen, onMobileViewChange, onToggle }: Props) {
     const { language, t, toggleLanguage } = useI18n();
 
     return (
@@ -25,73 +24,40 @@ export default function Header({ dark, activePage, activeMobileView, onPageChang
                         {t("app.subtitle")}
                     </p>
                 </div>
-                <PageNav activePage={activePage} onPageChange={onPageChange} toolLabel={t("nav.tool")} guideLabel={t("nav.guide")} />
                 <HeaderActions
                     dark={dark}
                     languageLabel={language === "ko" ? "EN" : "KO"}
                     languageTitle={t("language.toggle")}
                     themeTitle={dark ? t("theme.light") : t("theme.dark")}
+                    guideLabel={t("nav.guide")}
                     onToggleLanguage={toggleLanguage}
                     onToggleTheme={onToggle}
+                    onGuideOpen={onGuideOpen}
                     className="absolute right-0 top-5 hidden md:inline-flex sm:top-7"
-                    vertical
                 />
             </div>
             <div className="mx-auto mt-7 flex w-full items-center gap-3 md:hidden">
-                {activePage === "tool" && (
-                    <div className="grid min-w-0 flex-1 grid-cols-2 border-b border-slate-300 dark:border-slate-700">
-                        <MobileViewIcon active={activeMobileView === "barcode"} label={t("mobile.barcode")} onClick={() => onMobileViewChange("barcode")}>
-                            <BarcodeIcon />
-                        </MobileViewIcon>
-                        <MobileViewIcon active={activeMobileView === "qr"} label={t("mobile.qr")} onClick={() => onMobileViewChange("qr")}>
-                            <QRIcon />
-                        </MobileViewIcon>
-                    </div>
-                )}
-                {activePage === "guide" && (
-                    <div className="min-w-0 flex-1" />
-                )}
+                <div className="grid min-w-0 flex-1 grid-cols-2 border-b border-slate-300 dark:border-slate-700">
+                    <MobileViewIcon active={activeMobileView === "barcode"} label={t("mobile.barcode")} onClick={() => onMobileViewChange("barcode")}>
+                        <BarcodeIcon />
+                    </MobileViewIcon>
+                    <MobileViewIcon active={activeMobileView === "qr"} label={t("mobile.qr")} onClick={() => onMobileViewChange("qr")}>
+                        <QRIcon />
+                    </MobileViewIcon>
+                </div>
                 <HeaderActions
                     dark={dark}
                     languageLabel={language === "ko" ? "EN" : "KO"}
                     languageTitle={t("language.toggle")}
                     themeTitle={dark ? t("theme.light") : t("theme.dark")}
+                    guideLabel={t("nav.guide")}
                     onToggleLanguage={toggleLanguage}
                     onToggleTheme={onToggle}
+                    onGuideOpen={onGuideOpen}
                     className="inline-flex shrink-0"
-                    vertical
                 />
             </div>
         </header>
-    );
-}
-
-function PageNav({
-    activePage,
-    toolLabel,
-    guideLabel,
-    onPageChange,
-}: {
-    activePage: "tool" | "guide";
-    toolLabel: string;
-    guideLabel: string;
-    onPageChange: (page: "tool" | "guide") => void;
-}) {
-    const buttonClass = (page: "tool" | "guide") => `h-9 rounded-md px-4 text-sm font-semibold transition-colors ${
-        activePage === page
-            ? "bg-slate-950 text-white dark:bg-white dark:text-slate-950"
-            : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-    }`;
-
-    return (
-        <nav className="mx-auto mt-5 inline-flex rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/70" aria-label="Page">
-            <button type="button" className={buttonClass("tool")} onClick={() => onPageChange("tool")}>
-                {toolLabel}
-            </button>
-            <button type="button" className={buttonClass("guide")} onClick={() => onPageChange("guide")}>
-                {guideLabel}
-            </button>
-        </nav>
     );
 }
 
@@ -100,42 +66,54 @@ function HeaderActions({
     languageLabel,
     languageTitle,
     themeTitle,
+    guideLabel,
     onToggleLanguage,
     onToggleTheme,
+    onGuideOpen,
     className = "inline-flex",
-    vertical = false,
 }: {
     dark: boolean;
     languageLabel: string;
     languageTitle: string;
     themeTitle: string;
+    guideLabel: string;
     onToggleLanguage: () => void;
     onToggleTheme: () => void;
+    onGuideOpen: () => void;
     className?: string;
-    vertical?: boolean;
 }) {
-    const actionClass = "h-9 rounded-md text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700";
+    const actionClass = "flex h-9 w-12 items-center justify-center rounded-md text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700";
 
     return (
-        <div className={`${className} ${vertical ? "flex-col" : ""} items-center rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/80`}>
+        <div className={`${className} flex-col items-center rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/80`}>
             <button
                 type="button"
                 onClick={onToggleLanguage}
                 aria-label={languageTitle}
                 title={languageTitle}
-                className={`${actionClass} ${vertical ? "w-12 px-0" : "px-3"} text-sm font-bold tracking-wide`}
+                className={`${actionClass} text-sm font-bold`}
             >
                 {languageLabel}
             </button>
-            <div className={`${vertical ? "my-1 h-px w-6" : "mx-1 h-5 w-px"} bg-slate-200 dark:bg-slate-700`} />
+            <div className="my-1 h-px w-6 bg-slate-200 dark:bg-slate-700" />
             <button
                 type="button"
                 onClick={onToggleTheme}
                 title={themeTitle}
                 aria-label={themeTitle}
-                className={`${actionClass} flex ${vertical ? "w-12" : "w-9"} items-center justify-center`}
+                className={actionClass}
             >
                 {dark ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <div className="my-1 h-px w-6 bg-slate-200 dark:bg-slate-700" />
+            <button
+                type="button"
+                onClick={onGuideOpen}
+                title={guideLabel}
+                aria-label={guideLabel}
+                className={`${actionClass} text-xs font-semibold`}
+            >
+                {guideLabel}
             </button>
         </div>
     );

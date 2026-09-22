@@ -27,7 +27,7 @@ export default function CombinedInput({
     const inputCls = "w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500";
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3" data-tour="input">
             <div className="mx-auto max-w-xs space-y-2">
                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 text-center">{t("input.add")}</p>
                 <div className="grid grid-cols-2 gap-2">

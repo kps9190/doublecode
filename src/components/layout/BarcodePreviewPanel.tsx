@@ -22,6 +22,7 @@ export default function BarcodePreviewPanel({ barcode, input, previewSwipeHandle
         <div className="space-y-4">
             <div
                 className="flex min-h-[120px] items-center justify-center md:min-h-[320px]"
+                data-tour="preview"
                 {...previewSwipeHandlers}
             >
                 <BarcodePreview

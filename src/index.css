@@ -1,21 +1,84 @@
 @import "tailwindcss";
 
+/* Keep existing utility names while replacing the old blue/slate UI palette. */
+@theme {
+    --color-slate-50: #f6f7f5;
+    --color-slate-100: #e9eeea;
+    --color-slate-200: #d9dfda;
+    --color-slate-300: #b8c2bb;
+    --color-slate-400: #95a49a;
+    --color-slate-500: #64736b;
+    --color-slate-600: #506058;
+    --color-slate-700: #3d4943;
+    --color-slate-800: #2d3531;
+    --color-slate-900: #202725;
+    --color-slate-950: #17201b;
+
+    --color-blue-50: #eaf4f0;
+    --color-blue-200: #b8dcd1;
+    --color-blue-400: #83cbb7;
+    --color-blue-500: #2b8979;
+    --color-blue-600: #236f63;
+    --color-blue-700: #19574e;
+
+    --color-cyan-200: #bce5d9;
+    --color-cyan-300: #92d5c1;
+    --color-cyan-800: #286456;
+    --color-cyan-950: #193c35;
+
+    --color-gray-50: #f6f7f5;
+    --color-gray-300: #b8c2bb;
+    --color-gray-600: #506058;
+    --color-gray-700: #3d4943;
+    --color-gray-900: #202725;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-    --range-track: #cbd5e1;
-    --range-thumb: #2563eb;
-    --range-thumb-hover: #1d4ed8;
-    --color-picker-border: #94a3b8;
-    --color-picker-inner-border: rgb(15 23 42 / 0.22);
+    --range-track: #b8c2bb;
+    --range-thumb: #236f63;
+    --range-thumb-hover: #19574e;
+    --color-picker-border: #95a49a;
+    --color-picker-inner-border: rgb(23 32 27 / 0.22);
 }
 
 :root.dark {
-    --range-track: #64748b;
-    --range-thumb: #60a5fa;
-    --range-thumb-hover: #93c5fd;
-    --color-picker-border: #64748b;
-    --color-picker-inner-border: rgb(248 250 252 / 0.3);
+    --color-slate-50: #f5f5f2;
+    --color-slate-100: #e9eae6;
+    --color-slate-200: #d1d4ce;
+    --color-slate-300: #bdc2ba;
+    --color-slate-400: #a5aca4;
+    --color-slate-500: #899189;
+    --color-slate-600: #747c74;
+    --color-slate-700: #464a47;
+    --color-slate-800: #2c302e;
+    --color-slate-900: #1e2120;
+    --color-slate-950: #151817;
+
+    --color-blue-50: #f2f5e8;
+    --color-blue-200: #d9e3b7;
+    --color-blue-400: #bacb8b;
+    --color-blue-500: #8fa65f;
+    --color-blue-600: #566d36;
+    --color-blue-700: #40542a;
+
+    --color-cyan-200: #e1e8c8;
+    --color-cyan-300: #c7d69e;
+    --color-cyan-800: #4e6138;
+    --color-cyan-950: #30372b;
+
+    --color-gray-50: #f5f5f2;
+    --color-gray-300: #bdc2ba;
+    --color-gray-600: #747c74;
+    --color-gray-700: #464a47;
+    --color-gray-900: #1e2120;
+
+    --range-track: #626a61;
+    --range-thumb: #bacb8b;
+    --range-thumb-hover: #d9e3b7;
+    --color-picker-border: #747c74;
+    --color-picker-inner-border: rgb(245 245 242 / 0.3);
 }
 
 /* ── Range slider ──────────────────────────────────────────── */
@@ -36,7 +99,7 @@ input[type="range"]::-webkit-slider-thumb {
     border-radius: 50%;
     background: var(--range-thumb);
     border: 2px solid #ffffff;
-    box-shadow: 0 1px 6px rgb(15 23 42 / 0.35);
+    box-shadow: 0 1px 6px rgb(23 32 27 / 0.25);
     cursor: pointer;
     transition: transform 0.15s, background-color 0.15s;
 }
@@ -50,7 +113,7 @@ input[type="range"]::-moz-range-thumb {
     background: var(--range-thumb);
     cursor: pointer;
     border: 2px solid #ffffff;
-    box-shadow: 0 1px 6px rgb(15 23 42 / 0.35);
+    box-shadow: 0 1px 6px rgb(23 32 27 / 0.25);
 }
 input[type="range"]::-moz-range-track {
     height: 6px;
@@ -80,9 +143,19 @@ input[type="color"]::-moz-color-swatch {
 /* ── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #64736b; border-radius: 2px; }
+:root.dark ::-webkit-scrollbar-thumb { background: #626a61; }
 
 /* ── Transparent checkerboard ─────────────────────────────── */
 .checkerboard {
-    background: repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%) 0 0 / 10px 10px;
+    background: repeating-conic-gradient(#3d4943 0% 25%, #202725 0% 50%) 0 0 / 10px 10px;
+}
+:root.dark .checkerboard {
+    background: repeating-conic-gradient(#464a47 0% 25%, #2c302e 0% 50%) 0 0 / 10px 10px;
+}
+
+.tour-shade {
+    position: fixed;
+    z-index: 50;
+    background: rgb(16 18 17 / 0.68);
 }

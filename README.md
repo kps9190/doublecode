@@ -66,7 +66,7 @@ QR코드는 크기, 여백, 오류정정 수준, 점 모양, 색상, 배경, 중
 - 한국어 / 영어 UI
 - 라이트 / 다크 모드
 - 피드백 댓글
-- 간단한 사용법 페이지
+- 화면 위에서 따라가는 사용법 안내
 
 개발 환경과 프로젝트 구조는 [DEVELOPMENT.md](./DEVELOPMENT.md)에 따로 정리했습니다.
 
@@ -104,6 +104,6 @@ DoubleCode keeps that workflow in one place. Type once, preview both formats, ad
 - Korean / English UI
 - Light / dark mode
 - Feedback comments
-- A short usage guide
+- An on-screen usage guide
 
 Development setup and project structure live in [DEVELOPMENT.md](./DEVELOPMENT.md).

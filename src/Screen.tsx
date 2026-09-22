@@ -5,13 +5,7 @@ import { BarcodeOptions }                          from "./components/barcode";
 import { QROptions }                               from "./components/qrcode";
 import type { MobileCodeView }                     from "./types";
 import { I18nProvider }                            from "./i18n";
-import UsageGuide                                  from "./components/guide/UsageGuide";
-
-type Page = "tool" | "guide";
-
-function getPageFromHash(): Page {
-    return window.location.hash === "#guide" ? "guide" : "tool";
-}
+import UsageTour                                   from "./components/guide/UsageTour";
 
 export default function Screen() {
     const { dark, toggleDark } = useSystemTheme();
@@ -34,12 +28,12 @@ function ScreenContent({ dark, onToggleDark }: ScreenContentProps) {
     const input   = useCombinedInput("123456789");
     const barcode = useBarcode();
     const qr      = useQRCode();
-    const [page, setPage] = useState<Page>(getPageFromHash);
+    const [guideOpen, setGuideOpen] = useState(() => window.location.hash === "#guide");
     const [mobileView, setMobileView] = useState<MobileCodeView>("qr");
     const isInvalid = !!barcode.error || !!qr.warning;
 
     useEffect(() => {
-        const handleHashChange = () => setPage(getPageFromHash());
+        const handleHashChange = () => setGuideOpen(window.location.hash === "#guide");
         window.addEventListener("hashchange", handleHashChange);
         window.addEventListener("popstate", handleHashChange);
         return () => {
@@ -48,10 +42,11 @@ function ScreenContent({ dark, onToggleDark }: ScreenContentProps) {
         };
     }, []);
 
-    const handlePageChange = (next: Page) => {
-        setPage(next);
-        const nextUrl = next === "guide" ? "#guide" : `${window.location.pathname}${window.location.search}`;
-        window.history.pushState(null, "", nextUrl);
+    const closeGuide = () => {
+        setGuideOpen(false);
+        if (window.location.hash === "#guide") {
+            window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+        }
     };
 
     return (
@@ -59,40 +54,34 @@ function ScreenContent({ dark, onToggleDark }: ScreenContentProps) {
             <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 pb-12">
                 <Header
                     dark={dark}
-                    activePage={page}
                     activeMobileView={mobileView}
-                    onPageChange={handlePageChange}
+                    onGuideOpen={() => setGuideOpen(true)}
                     onMobileViewChange={setMobileView}
                     onToggle={onToggleDark}
                 />
 
-                {page === "guide" ? (
-                    <UsageGuide />
-                ) : (
-                    <>
-                        <MobileLayout
-                            barcode={barcode}
-                            qr={qr}
-                            input={input}
-                            isInvalid={isInvalid}
-                            activeView={mobileView}
-                            onViewChange={setMobileView}
-                        />
-                        <DesktopLayout barcode={barcode} qr={qr} input={input} isInvalid={isInvalid} />
+                <MobileLayout
+                    barcode={barcode}
+                    qr={qr}
+                    input={input}
+                    isInvalid={isInvalid}
+                    activeView={mobileView}
+                    onViewChange={setMobileView}
+                />
+                <DesktopLayout barcode={barcode} qr={qr} input={input} isInvalid={isInvalid} />
 
-                        <div className="hidden md:grid grid-cols-2 gap-8 mt-8">
-                            <BarcodeOptions opts={barcode.opts} onChange={barcode.setOpts} />
-                            <QROptions
-                                opts={qr.opts}
-                                onChange={qr.setOpts}
-                                onForceRecreate={qr.forceRecreate}
-                            />
-                        </div>
-                    </>
-                )}
+                <div className="hidden md:grid grid-cols-2 gap-8 mt-8" data-tour="settings">
+                    <BarcodeOptions opts={barcode.opts} onChange={barcode.setOpts} />
+                    <QROptions
+                        opts={qr.opts}
+                        onChange={qr.setOpts}
+                        onForceRecreate={qr.forceRecreate}
+                    />
+                </div>
 
                 <Footer />
             </div>
+            {guideOpen && <UsageTour onClose={closeGuide} />}
         </div>
     );
 }

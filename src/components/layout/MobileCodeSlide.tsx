@@ -34,7 +34,9 @@ export function BarcodeMobileSlide({ barcode, input, isInvalid, previewSwipeHand
         <div className={MOBILE_PANEL_CLASS}>
             <BarcodePreviewPanel barcode={barcode} input={input} previewSwipeHandlers={previewSwipeHandlers} />
             <CombinedInput {...input} isInvalid={isInvalid} />
-            <BarcodeOptions opts={barcode.opts} onChange={barcode.setOpts} />
+            <div data-tour="settings">
+                <BarcodeOptions opts={barcode.opts} onChange={barcode.setOpts} />
+            </div>
         </div>
     );
 }
@@ -44,11 +46,13 @@ export function QRMobileSlide({ qr, input, isInvalid, previewSwipeHandlers }: QR
         <div className={MOBILE_PANEL_CLASS}>
             <QRPreviewPanel qr={qr} input={input} containerRef={qr.containerRefM} previewSwipeHandlers={previewSwipeHandlers} />
             <CombinedInput {...input} isInvalid={isInvalid} />
-            <QROptions
-                opts={qr.opts}
-                onChange={qr.setOpts}
-                onForceRecreate={qr.forceRecreate}
-            />
+            <div data-tour="settings">
+                <QROptions
+                    opts={qr.opts}
+                    onChange={qr.setOpts}
+                    onForceRecreate={qr.forceRecreate}
+                />
+            </div>
         </div>
     );
 }

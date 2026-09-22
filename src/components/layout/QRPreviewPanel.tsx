@@ -23,6 +23,7 @@ export default function QRPreviewPanel({ qr, input, containerRef, previewSwipeHa
         <div className="space-y-4">
             <div
                 className="relative flex min-h-[260px] w-full items-center justify-center md:min-h-[320px]"
+                data-tour="preview"
                 {...previewSwipeHandlers}
             >
                 <QRCard

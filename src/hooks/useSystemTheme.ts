@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-const DARK_BG = "#0f172a";
-const LIGHT_BG = "#f8fafc";
+const DARK_BG = "#1e2120";
+const LIGHT_BG = "#f6f7f5";
 const THEME_QUERY = "(prefers-color-scheme: dark)";
 
 export function useSystemTheme() {
@@ -11,6 +11,7 @@ export function useSystemTheme() {
         document.documentElement.classList.toggle("dark", dark);
         document.documentElement.style.colorScheme = dark ? "dark" : "light";
         document.documentElement.style.backgroundColor = dark ? DARK_BG : LIGHT_BG;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? DARK_BG : LIGHT_BG);
     }, [dark]);
 
     useEffect(() => {

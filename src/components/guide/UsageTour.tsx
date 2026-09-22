@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import JsBarcode from "jsbarcode";
 import { useI18n } from "../../i18n";
 
 type Target = "input" | "preview" | "settings" | "download";
@@ -13,7 +14,7 @@ const steps: { target: Target; ko: [string, string]; en: [string, string] }[] = 
     },
     {
         target: "preview",
-        ko: ["바로 확인", "입력 내용을 바꾸면 바코드와 QR코드 미리보기가 동시에 갱신됩니다. 모바일에서는 위쪽 아이콘을 눌러 두 미리보기를 전환할 수 있습니다."],
+        ko: ["확인", "입력 내용을 바꾸면 바코드와 QR코드 미리보기가 동시에 갱신됩니다. 모바일에서는 위쪽 아이콘을 눌러 두 미리보기를 전환할 수 있습니다."],
         en: ["Check the preview", "Changes to the input update both previews at once. On mobile, tap the icons above to switch between the barcode and QR code."],
     },
     {
@@ -28,25 +29,62 @@ const steps: { target: Target; ko: [string, string]; en: [string, string] }[] = 
     },
 ];
 
-function findVisibleTarget(target: Target): HTMLElement | undefined {
-    return Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`))
-        .find((element) => element.getClientRects().length > 0);
+function findVisibleTargets(target: Target): HTMLElement[] {
+    const visible = Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`))
+        .filter((element) => element.getClientRects().length > 0);
+    return target === "preview" || target === "download" ? visible : visible.slice(0, 1);
+}
+
+function InputBarcodeDemo({ value, language }: { value: string; language: "ko" | "en" }) {
+    const svgRef = useRef<SVGSVGElement>(null);
+
+    useLayoutEffect(() => {
+        if (!svgRef.current) return;
+        JsBarcode(svgRef.current, value, {
+            format: "CODE128",
+            lineColor: "#202725",
+            background: "#ffffff",
+            width: 1.3,
+            height: 36,
+            margin: 3,
+            displayValue: false,
+        });
+    }, [value]);
+
+    return (
+        <div className="mt-2 flex h-12 items-center justify-center rounded-md bg-white">
+            <svg ref={svgRef} role="img" aria-label={language === "ko" ? `예시 바코드: ${value}` : `Example barcode: ${value}`} className="block max-h-10 max-w-full" />
+        </div>
+    );
 }
 
 export default function UsageTour({ onClose }: { onClose: () => void }) {
     const { language } = useI18n();
     const [stepIndex, setStepIndex] = useState(0);
+    const [inputDemoStage, setInputDemoStage] = useState(0);
     const [highlight, setHighlight] = useState<Highlight | null>(null);
     const dialogRef = useRef<HTMLDivElement>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
     const step = steps[stepIndex];
     const [title, body] = language === "ko" ? step.ko : step.en;
+    const demoValue = `${inputDemoStage >= 1 ? "A-" : ""}123456789${inputDemoStage >= 2 ? "-Z" : ""}`;
 
     useEffect(() => {
         const previousFocus = document.activeElement as HTMLElement | null;
         closeRef.current?.focus();
         return () => previousFocus?.focus();
     }, []);
+
+    useEffect(() => {
+        if (step.target !== "input") return;
+        const leftTimer = window.setTimeout(() => setInputDemoStage(1), 800);
+        const rightTimer = window.setTimeout(() => setInputDemoStage(2), 1900);
+        return () => {
+            window.clearTimeout(leftTimer);
+            window.clearTimeout(rightTimer);
+            setInputDemoStage(0);
+        };
+    }, [step.target]);
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
@@ -71,23 +109,30 @@ export default function UsageTour({ onClose }: { onClose: () => void }) {
     }, [onClose]);
 
     useLayoutEffect(() => {
-        const target = findVisibleTarget(step.target);
-        if (!target) return;
+        const targets = findVisibleTargets(step.target);
+        if (targets.length === 0) return;
+        const target = targets[0];
 
         const measure = () => {
-            const rect = target.getBoundingClientRect();
-            const x = Math.max(8, rect.left - 8);
-            const y = Math.max(8, rect.top - 8);
+            const rects = targets.map((element) => element.getBoundingClientRect());
+            const left = Math.min(...rects.map((rect) => rect.left));
+            const top = Math.min(...rects.map((rect) => rect.top));
+            const right = Math.max(...rects.map((rect) => rect.right));
+            const bottom = Math.max(...rects.map((rect) => rect.bottom));
+            const x = Math.max(8, left - 8);
+            const y = Math.max(8, top - 8);
             setHighlight({
                 x,
                 y,
-                width: Math.max(0, Math.min(window.innerWidth - 8, rect.right + 8) - x),
-                height: Math.max(0, Math.min(window.innerHeight - 8, rect.bottom + 8) - y),
+                width: Math.max(0, Math.min(window.innerWidth - 8, right + 8) - x),
+                height: Math.max(0, Math.min(window.innerHeight - 8, bottom + 8) - y),
             });
         };
 
-        if (step.target === "settings") {
-            const desiredTop = Math.min(window.innerHeight * 0.42, 290);
+        if (step.target === "settings" || step.target === "input") {
+            const desiredTop = step.target === "input"
+                ? Math.min(window.innerHeight * 0.22, 200)
+                : Math.min(window.innerHeight * 0.42, 290);
             window.scrollTo({ top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - desiredTop), behavior: "smooth" });
         } else {
             target.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -96,7 +141,7 @@ export default function UsageTour({ onClose }: { onClose: () => void }) {
         window.addEventListener("scroll", measure, true);
         window.addEventListener("resize", measure);
         const observer = new ResizeObserver(measure);
-        observer.observe(target);
+        targets.forEach((element) => observer.observe(element));
 
         return () => {
             window.removeEventListener("scroll", measure, true);
@@ -156,6 +201,27 @@ export default function UsageTour({ onClose }: { onClose: () => void }) {
                 </div>
                 <h2 id="tour-title" className="mt-3 text-lg font-semibold">{title}</h2>
                 <p id="tour-body" className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{body}</p>
+                {step.target === "input" && (
+                    <div className="mt-4" aria-label={language === "ko" ? "입력창 추가 예시" : "Input field example"}>
+                        <div className="flex justify-center gap-2 text-xs font-medium">
+                            <span className={`rounded-md border px-3 py-1.5 ${inputDemoStage >= 1 ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400"}`}>
+                                {language === "ko" ? "왼쪽" : "Left"}
+                            </span>
+                            <span className={`rounded-md border px-3 py-1.5 ${inputDemoStage >= 2 ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 text-slate-500 dark:border-slate-600 dark:text-slate-400"}`}>
+                                {language === "ko" ? "오른쪽" : "Right"}
+                            </span>
+                        </div>
+                        <div className="mt-3 flex min-h-9 gap-1.5 text-center text-xs font-medium">
+                            {inputDemoStage >= 1 && <span className="tour-demo-field flex min-w-0 flex-1 items-center justify-center rounded-md border border-blue-400 bg-blue-50 text-slate-900 dark:bg-slate-700 dark:text-slate-100">A-</span>}
+                            <span className="flex min-w-0 flex-1 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100">123456789</span>
+                            {inputDemoStage >= 2 && <span className="tour-demo-field flex min-w-0 flex-1 items-center justify-center rounded-md border border-blue-400 bg-blue-50 text-slate-900 dark:bg-slate-700 dark:text-slate-100">-Z</span>}
+                        </div>
+                        <p className="mt-2 text-center text-xs font-semibold text-slate-600 dark:text-slate-300" aria-live="polite">
+                            {language === "ko" ? "생성 값" : "Result"} <span className="mx-1">→</span> {demoValue}
+                        </p>
+                        <InputBarcodeDemo value={demoValue} language={language} />
+                    </div>
+                )}
                 <div className="mt-5 flex justify-end gap-2">
                     {stepIndex > 0 && (
                         <button type="button" onClick={() => setStepIndex(stepIndex - 1)} className="h-9 rounded-md px-3 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">

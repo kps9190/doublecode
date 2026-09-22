@@ -159,3 +159,16 @@ input[type="color"]::-moz-color-swatch {
     z-index: 50;
     background: rgb(16 18 17 / 0.68);
 }
+
+.tour-demo-field {
+    animation: tour-field-enter 220ms ease-out both;
+}
+
+@keyframes tour-field-enter {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tour-demo-field { animation: none; }
+}
